@@ -3,12 +3,12 @@ import '../../index.css'
 
 const Logo = () => {
     return (
-        <div className="flex justify-end">
-            <p className="text-2xl">S</p>
-            <div className="">
-                <img src={lifebuoy} height={10} width={10} alt="" />
+        <div className="flex justify-start items-center">
+            <p className="text-3xl font-bold">S</p>
+            <div className="flex justify-center h-full">
+                <img src={lifebuoy} height={50} width={50} alt="" />
             </div>
-            <p>S</p>
+            <p className="text-3xl font-bold">S</p>
         </div>
     )
 }
