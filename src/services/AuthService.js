@@ -4,10 +4,40 @@ import api from "../utilities/api";
 
 function AuthService() {
     const navigate = useNavigate();
-    const login = async (username, password) => {
+
+    const errorProcessor = (error) => {
+        if (error.response && error.response.status === 401) {
+            navigate("/");
+        }
+
+        if (error.response) {
+            Toastify.error(error.response.data.message);
+        }
+    }
+
+    const signup = async (email, name, password, repeatPassword, phoneNumber, address) => {
+        try {
+            const response = await api.post("/auth/signup", {
+                email,
+                name,
+                password,
+                repeatPassword,
+                phoneNumber,
+                address,
+            });
+            if (response.status === 200) {
+                Toastify.success("Signup Successful");
+                navigate("/login");
+            }
+        } catch (error) {
+            errorProcessor(error);
+        }
+    }
+
+    const login = async (email, password) => {
         try {
             const response = await api.post("/auth/login", {
-                username,
+                email,
                 password,
             });
             if (response.status === 200) {
@@ -16,15 +46,13 @@ function AuthService() {
 
                 localStorage.setItem("accessToken", response.data.accessToken);
                 localStorage.setItem("refreshToken", response.data.refreshToken);
-                localStorage.setItem("username", response.data.user.username);
+                localStorage.setItem("email", response.data.user.email);
 
                 const role = response.data.user.role;
                 role && navigate(`/${role === "admin" ? "admin" : "dashboard"}`);
             }
         } catch (error) {
-            if (error.response) {
-                Toastify.error(error.response.data.message);
-            }
+            errorProcessor(error);
         }
     };
 
@@ -34,13 +62,11 @@ function AuthService() {
             if (response.status === 200) {
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
-                localStorage.removeItem("username");
+                localStorage.removeItem("email");
                 navigate("/");
             }
         } catch (error) {
-            if (error.response) {
-                Toastify.error(error.response.data.message);
-            }
+            errorProcessor(error);
         }
     }
 
@@ -51,17 +77,12 @@ function AuthService() {
                 return response.data.user;
             }
         } catch (error) {
-            if (error.response && error.response.status === 401) {
-                navigate("/");
-            }
-
-            if (error.response) {
-                Toastify.error(error.response.data.message);
-            }
+            errorProcessor(error);
         }
     }
 
     return {
+        signup,
         login,
         logout,
         getUserProfile
