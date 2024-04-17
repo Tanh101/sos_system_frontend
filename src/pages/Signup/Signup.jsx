@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,7 +7,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import Logo from "../../components/logo/Logo"
+import Logo from "../../components/Logo/Logo"
 import AuthService from "../../services/AuthService";
 import { formatDate } from "../../utilities/formatDate";
 import signupSchema from "../../validations/signupSchema";
@@ -32,8 +31,8 @@ const Signup = () => {
     });
 
     const formSubmit = async (data) => {
-        const { email, name, password, repeatPassword, dob, phoneNumber, address } = data;
-        signup(email, name, password, repeatPassword, dob, phoneNumber, address);
+        const { email, name, password, repeatPassword, phoneNumber, dob, address } = data;
+        signup(email, name, password, repeatPassword, formatDate(dob), phoneNumber, address);
     }
 
     const handleDateChange = (date) => {
@@ -150,7 +149,6 @@ const Signup = () => {
                                     defaultValue={date}
                                     render={() => (
                                         <DatePicker className='outline-none w-full' name="dob" selected={date} onChange={handleDateChange}
-
                                         />
                                     )}
                                 />

@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import Logo from "../../components/logo/Logo"
+import Logo from "../../components/Logo/Logo"
 import AuthService from "../../services/AuthService";
 import { Link } from "react-router-dom";
 import loginSchema from "../../validations/loginShema";

@@ -7,7 +7,7 @@ function AuthService() {
 
     const errorProcessor = (error) => {
         if (error.response && error.response.status === 401) {
-            navigate("/");
+            navigate("/login");
         }
 
         if (error.response) {
@@ -15,23 +15,29 @@ function AuthService() {
         }
     }
 
-    const signup = async (email, name, password, repeatPassword, phoneNumber, address) => {
+    const signup = async (email, name, password, repeatPassword, dob, phoneNumber, address) => {
         try {
-            const response = await api.post("/auth/signup", {
+            if (password !== repeatPassword) {
+                Toastify.error("Passwords do not match");
+                return;
+            }
+
+            const response = await api.post("/auth/register", {
                 email,
                 name,
                 password,
                 repeatPassword,
+                dob,
                 phoneNumber,
                 address,
             });
-            if (response.status === 200) {
+            if (response.status === 201) {
                 Toastify.success("Signup Successful");
                 navigate("/login");
             }
         } catch (error) {
             errorProcessor(error);
-        }
+        }   
     }
 
     const login = async (email, password) => {
@@ -49,7 +55,15 @@ function AuthService() {
                 localStorage.setItem("email", response.data.user.email);
 
                 const role = response.data.user.role;
-                role && navigate(`/${role === "admin" ? "admin" : "dashboard"}`);
+                if (role === 'user') {
+                    navigate("/");
+                }else if (role === 'admin') {
+                    navigate("/admin");
+                }else if (role === 'recuser'){
+                    navigate("/recuser");
+                }else {
+                    navigate("/login");
+                }
             }
         } catch (error) {
             errorProcessor(error);
@@ -63,7 +77,7 @@ function AuthService() {
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
                 localStorage.removeItem("email");
-                navigate("/");
+                navigate("/login");
             }
         } catch (error) {
             errorProcessor(error);
@@ -72,9 +86,9 @@ function AuthService() {
 
     const getUserProfile = async () => {
         try {
-            const response = await api.get("/auth/me");
+            const response = await api.get("/user/profile");
             if (response.status === 200) {
-                return response.data.user;
+                return response.data;
             }
         } catch (error) {
             errorProcessor(error);
