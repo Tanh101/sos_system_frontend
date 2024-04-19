@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Signup />} />
-            <Route path="*" element={<UserNavigation />} />
+            <Route path="/*" element={<UserNavigation />} />
         </Routes>
         <ToastContainer />
     </Router>

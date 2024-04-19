@@ -20,6 +20,7 @@ const Navbar = () => {
         }
         
         fetchUserProfile();
+        console.log('fetchUserProfile in navbar');
     }, []);
 
     const { logout } = AuthService();
@@ -60,7 +61,7 @@ const Navbar = () => {
 
 
     return (
-        <div className='flex justify-between shadow-lg items-center h-16 bg-white font-poppins'>
+        <div className='flex justify-between shadow-xl border-b items-center bg-white font-poppins'>
             <div className='mx-10 font-semibold text-xl'>
                 <Logo />
             </div>
@@ -81,8 +82,8 @@ const Navbar = () => {
                     {isDropdownOpen && (
                         <div className="absolute top-full right-4 mt-3 w-48 bg-white rounded-md rounded-t-none shadow-lg z-50">
                             <div className="py-1">
-                                <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" to={"supports"}>Profile</Link>
-                                <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={handleSubmit}>
+                                <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#F73334] hover:text-white" to={"supports"}>Profile</Link>
+                                <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#F73334] hover:text-white" onClick={handleSubmit}>
                                     <button type="button">Logout</button>
                                 </div>
                             </div>

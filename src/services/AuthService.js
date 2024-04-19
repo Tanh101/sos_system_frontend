@@ -1,19 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Toastify } from "../toastify/Toastify";
 import api from "../utilities/api";
+import ErrorProcessService from "./ErrorProcessService";
 
 function AuthService() {
     const navigate = useNavigate();
 
-    const errorProcessor = (error) => {
-        if (error.response && error.response.status === 401) {
-            navigate("/login");
-        }
+    const { errorProcessor } = ErrorProcessService();
 
-        if (error.response) {
-            Toastify.error(error.response.data.message);
-        }
-    }
 
     const signup = async (email, name, password, repeatPassword, dob, phoneNumber, address) => {
         try {
@@ -37,7 +31,7 @@ function AuthService() {
             }
         } catch (error) {
             errorProcessor(error);
-        }   
+        }
     }
 
     const login = async (email, password) => {
@@ -57,11 +51,11 @@ function AuthService() {
                 const role = response.data.user.role;
                 if (role === 'user') {
                     navigate("/");
-                }else if (role === 'admin') {
+                } else if (role === 'admin') {
                     navigate("/admin");
-                }else if (role === 'recuser'){
+                } else if (role === 'recuser') {
                     navigate("/recuser");
-                }else {
+                } else {
                     navigate("/login");
                 }
             }
@@ -91,6 +85,7 @@ function AuthService() {
                 return response.data;
             }
         } catch (error) {
+            console.log(error);
             errorProcessor(error);
         }
     }
@@ -99,7 +94,7 @@ function AuthService() {
         signup,
         login,
         logout,
-        getUserProfile
+        getUserProfile,
     };
 }
 
