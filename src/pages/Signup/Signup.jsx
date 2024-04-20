@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,7 +7,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import Logo from "../../components/logo/Logo"
+import Logo from "../../components/Logo/Logo"
 import AuthService from "../../services/AuthService";
 import { formatDate } from "../../utilities/formatDate";
 import signupSchema from "../../validations/signupSchema";
@@ -32,8 +31,8 @@ const Signup = () => {
     });
 
     const formSubmit = async (data) => {
-        const { email, name, password, repeatPassword, dob, phoneNumber, address } = data;
-        signup(email, name, password, repeatPassword, dob, phoneNumber, address);
+        const { email, name, password, repeatPassword, phoneNumber, dob, address } = data;
+        signup(email, name, password, repeatPassword, formatDate(dob), phoneNumber, address);
     }
 
     const handleDateChange = (date) => {
@@ -143,17 +142,17 @@ const Signup = () => {
                             <label className="font-medium text-base mt-3 mb-2" htmlFor="dob">
                                 Date of birth
                             </label>
-                            <div className='flex items-center w-64 z-10 py-2 px-2 rounded-2xl border-2'>
+                            <div className="flex items-center px-3 w-64 z-50 py-2 rounded-2xl border-2">
                                 <Controller
                                     name="dob"
                                     control={control}
                                     defaultValue={date}
                                     render={() => (
-                                        <DatePicker className='outline-none' name="dob" selected={date} onChange={handleDateChange} />
+                                        <DatePicker className='outline-none w-full' name="dob" selected={date} onChange={handleDateChange}
+                                        />
                                     )}
                                 />
-
-                                <FontAwesomeIcon icon={faCalendar} color={'#387DE4'} size='lg' />
+                                <FontAwesomeIcon className="mr-2" icon={faCalendar} color={'#387DE4'} size='lg' />
                             </div>
                             {errors?.dob && (
                                 <div className="flex flex-wrap max-w-52">

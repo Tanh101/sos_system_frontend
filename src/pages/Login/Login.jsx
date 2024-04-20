@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import Logo from "../../components/logo/Logo"
+import Logo from "../../components/Logo/Logo"
 import AuthService from "../../services/AuthService";
 import { Link } from "react-router-dom";
 import loginSchema from "../../validations/loginShema";
@@ -29,7 +29,7 @@ const Login = () => {
     return (
         <div>
             <div className="flex justify-center items-center h-screen bg-blue-50">
-                <div className="flex flex-col shadow-md p-10 px-20 rounded-xl bg-white lg:w-[500px] ">
+                <div className="flex flex-col shadow-md p-10 px-20 rounded-xl bg-white lg:w-[600px] ">
                     <Logo />
                     <form
                         className="form flex flex-col mt-2"

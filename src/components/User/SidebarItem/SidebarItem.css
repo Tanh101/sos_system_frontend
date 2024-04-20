@@ -1,0 +1,19 @@
+.sidebar__menu:hover .fa-life-ring,
+.sidebar__menu:hover .fa-message,
+.sidebar__menu:hover .fa-bell,
+.sidebar__menu:hover .fa-location-dot,
+.sidebar__menu:hover .fa-tower-broadcast {
+    color: #fff;
+}
+
+.sidebar__menu:hover .sidebar__item {
+    background-color: #F73334;
+
+}
+
+.sidebar__menu:hover .sidebar__item .animation__icon {
+    --tw-scale-x: 1.25;
+    --tw-scale-y: 1.25;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    animation-duration: 3s;
+}
