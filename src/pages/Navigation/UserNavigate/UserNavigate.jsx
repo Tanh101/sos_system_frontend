@@ -8,6 +8,7 @@ import Sidebar from "../../../components/User/Sidebar/Sidebar";
 const Home = React.lazy(() => import('../../../components/Home/Home'));
 const RequestHistories = React.lazy(() => import('../../../components/RequestHistories/RequestHistories'));
 const Help = React.lazy(() => import('../../../components/Help/Help'));
+const Emergency = React.lazy(() => import("../../../components/Emergency/Emergency"));
 
 
 const UserNavigation = () => {
@@ -21,6 +22,7 @@ const UserNavigation = () => {
                         <Routes>
                             <Route path="/help" element={<Help />} />
                             <Route path="/requests" element={<RequestHistories />} />
+                            <Route path="/location" element={<Emergency />} />
                             <Route path="/" element={<Home />} />
                         </Routes>
                     </Suspense>
