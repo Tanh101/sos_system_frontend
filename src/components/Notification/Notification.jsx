@@ -8,7 +8,7 @@ const Notification = ({ count }) => {
     return (
         <IconButton aria-label="Notifications">
             <Badge badgeContent={count} color="error">
-                <FontAwesomeIcon color='#050505' icon={faBell} />
+                <FontAwesomeIcon color='slate-400' icon={faBell} />
             </Badge>
         </IconButton>
     );

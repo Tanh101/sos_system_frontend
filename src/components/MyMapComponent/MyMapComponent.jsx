@@ -2,20 +2,16 @@ import { useCallback, useRef } from "react";
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 import PlaceInfo from "./PlaceInfo";
 
-const apiKey = import.meta.env.VITE_MAP_API_KEY;
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const libraries = ["places"];
-const mapContainerStyle = {
-    height: "60vh",
-    width: "100%"
-};
 
 const options = {
     disableDefaultUI: true,
     zoomControl: true
 };
 
-const MyMapComponent = () => {
+const MyMapComponent = ({mapContainerStyle}) => {
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: apiKey,
         libraries

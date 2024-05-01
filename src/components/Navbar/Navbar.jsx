@@ -1,27 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import avatar from '../../assets/imgs/avatar.png';
 import AuthService from '../../services/AuthService';
 import Notification from '../Notification/Notification';
 import Logo from '../Logo/Logo';
+import { UserContext } from '../Context/UserContext/UserContext';
 
 const Navbar = () => {
     const count = 10;
 
-    const { getUserProfile } = AuthService();
-
-    const [user, setUser] = useState({});
-
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            const userProfile = await getUserProfile();
-            setUser(userProfile);
-        }
-        
-        fetchUserProfile();
-        console.log('fetchUserProfile in navbar');
-    }, []);
+    const userContext = useContext(UserContext)
 
     const { logout } = AuthService();
 
@@ -76,8 +65,8 @@ const Navbar = () => {
                         <img className='object-cover w-12 h-12 cursor-pointer' loading='lazy' src={avatar} alt="" />
                     </div>
                     <div className='flex justify-between flex-1 flex-col mx-5 font-semibold cursor-pointer'>
-                        <p className='font-semibold'>{user?.name}</p>
-                        <p className='text-sm font-normal'>{user?.email}</p>
+                        <p className='font-semibold'>{userContext?.name}</p>
+                        <p className='text-sm font-normal'>{userContext?.email}</p>
                     </div>
                     {isDropdownOpen && (
                         <div className="absolute top-full right-4 mt-3 w-48 bg-white rounded-md rounded-t-none shadow-lg z-50">
