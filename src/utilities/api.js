@@ -1,59 +1,55 @@
 import axios from "axios";
-import { AppBaseUrl as baseURL } from "../constants/config";
+import { AppBaseUrl } from "../constants/config";
 
-const buildApi = () => {
-    const instance = axios.create({
-        baseURL,
-        withCredentials: false,
-    });
+const instance = axios.create({
+    baseURL: AppBaseUrl,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
 
-    instance.interceptors.request.use((config) => {
-        const accessToken = window.localStorage.getItem("accessToken");
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
-        }
-        return config;
-    });
+instance.interceptors.request.use((config) => ({
+    ...config,
+    headers: {
+        ...config.headers,
+        Authorization: `Bearer ${window.localStorage.getItem("accessToken")}`,
+    },
+}));
 
-    const refreshToken = async () => {
-        try {
-            const accessToken = localStorage.getItem("accessToken");
-            const refreshToken = localStorage.getItem("refreshToken");
-            const response = await instance.post("/auth/refresh", {
-                accessToken,
-                refreshToken,
-            });
-            if (response.status === 200) {
-                localStorage.setItem("accessToken", response.data.accessToken);
-                return response.data.accessToken;
-            }
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
 
-    instance.interceptors.response.use(
-        (response) => {
-            return response;
-        },
-        async (error) => {
-            const originalRequest = error.config;
-            if (error.response && error.response.status === 401 && !originalRequest._retry) {
-                originalRequest._retry = true;
+instance.interceptors.response.use(
+    (res) => {
+        return res;
+    },
+    async (err) => {
+        const originalConfig = err.config;
+
+        if (originalConfig.url !== "/auth/login" && err.response) {
+            if (err.response.status === 401 && !originalConfig._retry) {
+                originalConfig._retry = true;
+
+                const refreshToken = localStorage.getItem("refreshToken");
+                if (!refreshToken) {
+                    window.location.href = "/login";
+                    return;
+                }
                 try {
-                    const accessToken = await refreshToken();
-                    originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                    return instance(originalRequest);
-                } catch (error) {
-                    return Promise.reject(error);
+                    const rs = await instance.post("/auth/refresh", {
+                        refreshToken: refreshToken,
+                    });
+
+                    const { accessToken } = rs.data;
+                    localStorage.setItem("accessToken", accessToken)
+
+                    return instance(originalConfig);
+                } catch (_error) {
+                    return Promise.reject(_error);
                 }
             }
-            return Promise.reject(error);
         }
-    );
 
-    return instance;
-}
+        return Promise.reject(err);
+    }
+);
 
-const api = buildApi();
-export default api;
+export default instance;

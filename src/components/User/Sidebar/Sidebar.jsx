@@ -1,26 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { faLocationDot, faBell, faLifeRing, faMessage, faTowerBroadcast } from "@fortawesome/free-solid-svg-icons"
+
 import SidebarItem from "../SidebarItem/SidebarItem"
-import AuthService from '../../../services/AuthService';
 
 const Sidebar = () => {
-    const {getUserProfile} = AuthService();
 
     const [activeItem, setActiveItem] = useState('home');
 
     const handleItemClick = (item) => {
         setActiveItem(item);
     };
-
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            const userProfile = await getUserProfile();
-        }
-        
-        fetchUserProfile();
-
-        console.log('fetchUserProfile in sidebar');
-    }, []);
 
     return (
         <div className='flex flex-col items-center h-screen lg:px-3 duration-150 md:px-1 bg-white'>
