@@ -1,8 +1,9 @@
+import { useState } from "react"
 import { faArrowRight, faLocationDot } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import MyMapComponent from "../../MyMapComponent/MyMapComponent"
-import { useState } from "react"
+import "./FormRequest.css"
 
 const FormRequest = () => {
 
@@ -14,10 +15,10 @@ const FormRequest = () => {
     const [requestContent, setRequestContent] = useState("Tôi cần cứu hộ khẩn cấp")
     const [userAddress, setUserAddress] = useState("40 Ngô Sĩ Liên, Đà Nẵng")
     return (
-        <div className='bg-white items-center justify-center rounded-lg shadow-lg px-6 pb-6'>
+        <div className='bg-white items-center justify-center rounded-lg shadow-lg px-6 pb-6 min-w-96 w-full'>
             <form className="flex flex-col rounded-xl">
-                <div className="flex justify-start items-center my-5">
-                    <label className="mr-10 font-semibold" htmlFor="address">Nhập địa chỉ của bạn</label>
+                <div className="flex lg:flex-row flex-col justify-start lg:items-center items-start my-5">
+                    <label className="lg:mr-4 font-semibold" htmlFor="address">Nhập địa chỉ của bạn</label>
                     <div className='flex border rounded-xl px-2 justify-center items-center shadow-md' >
                         <FontAwesomeIcon icon={faLocationDot} color="red" />
                         <input
@@ -52,7 +53,7 @@ const FormRequest = () => {
                                 <option value="">Khác</option>
                             </select>
                         </div>
-                        <div className="flex my-5">
+                        <div className="flex lg:flex-row flex-col my-5">
                             <div className="flex w-44 flex-wrap">
                                 <label className="mr-5 font-semibold" htmlFor="about">Nội dung cần hỗ trợ</label>
                             </div>

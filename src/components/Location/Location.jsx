@@ -1,12 +1,21 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import MyMapComponent from "../MyMapComponent/MyMapComponent"
 import { faArrowRight, faLocationDot } from "@fortawesome/free-solid-svg-icons"
+import { useContext, useEffect } from "react";
 
-const Emergency = () => {
+import MyMapComponent from "../MyMapComponent/MyMapComponent"
+import { UserContext } from "../../Context/UserContext/UserContext";
+
+const Location = () => {
     const mapContainerStyle = {
         height: "100vh",
         width: "100%"
     };
+
+    const { setActiveItem } = useContext(UserContext);
+
+    useEffect(() => {
+        setActiveItem("location");
+    }, []);
 
     return (
         <div className="flex flex-col flex-1 w-full bg-white">
@@ -31,4 +40,4 @@ const Emergency = () => {
     )
 }
 
-export default Emergency
+export default Location

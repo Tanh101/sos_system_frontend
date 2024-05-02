@@ -16,7 +16,6 @@ const Ring = () => {
                 </p>
             </div>
             <Popup
-                className="bg-white"
                 trigger={
                     <button className="ring my-10 mt-48" onClick={() => { console.log('sos') }}>
                         <div className="coccoc-alo-phone coccoc-alo-green coccoc-alo-show flex justify-center items-center">
@@ -30,13 +29,9 @@ const Ring = () => {
                 }
                 modal
                 nested
-                contentStyle={{ borderRadius: '10px' }} // Adjust the border radius value as needed
+                contentStyle={{ borderRadius: '10px' }}
             >
-                <div className='bg-white rounded-xl'>
-                    <div className=''>
-                        <FormRequest />
-                    </div>
-                </div>
+                <FormRequest />
             </Popup>
             <div className="flex justify-center ml-3 mt-3">
                 <p className="font-semibold text-2xl">Emergency Request</p>
