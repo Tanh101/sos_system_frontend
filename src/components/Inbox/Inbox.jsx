@@ -1,33 +1,21 @@
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 
 import { UserContext } from '../../Context/UserContext/UserContext';
 
 const Inbox = () => {
-    const [position, setPosition] = useState({ latitude: null, longitude: null });
 
-    const { setActiveItem } = useContext(UserContext);
-
+    const { setActiveItem, location } = useContext(UserContext);
+    // console.log(location);
     useEffect(() => {
         setActiveItem("messages");
-
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                setPosition({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                });
-            });
-        } else {
-            console.log("Geolocation is not available in your browser.");
-        }
     }, []);
 
     return (
         <div>
             <h2>My Current Location</h2>
-            {position.latitude && position.longitude ? (
+            {location?.lat && location?.lng && location.address ? (
                 <p>
-                    Latitude: {position.latitude}, Longitude: {position.longitude}
+                    Latitude: {location.lat}, Longitude: {location.lng}, Address: {location.address}
                 </p>
             ) : (
                 <p>Loading...</p>

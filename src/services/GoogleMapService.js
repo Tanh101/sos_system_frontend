@@ -13,9 +13,9 @@ function GoogleMapService() {
             }
 
             const response = await fetch(`${googleMapApiUrl}latlng=${location.lat},${location.lng}&key=${apiKey}`);
-
             if (response.status === 200) {
-                return response.results;
+                const data = await response.json();
+                return data.results[0].formatted_address;
             }
         } catch (error) {
             errorProcessor(error);
