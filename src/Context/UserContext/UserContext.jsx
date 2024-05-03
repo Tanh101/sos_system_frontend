@@ -8,13 +8,9 @@ export const UserProvider = ({ children }) => {
     const { getUserProfile } = AuthService();
     const { ReverseGeocoding } = GoogleMapService();
 
-    const [res, setRes] = useState(null);
-
-    const [location, setLocation] = useState({ lat: null, lng: null, address: "" });
-
     const [user, setUser] = useState({});
     const [activeItem, setActiveItem] = useState('home');
-
+    const [location, setLocation] = useState({ lat: null, lng: null, address: null });
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -27,27 +23,32 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function (position) {
+            const fetchGeocoding = async (location) => {
+                try {
+                    const res = await ReverseGeocoding(location);
+                    return res;
+                } catch (error) {
+                    console.error("Error fetching geocoding:", error);
+                }
+            }
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const address = await fetchGeocoding({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                });
+
                 setLocation({
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
+                    address: address
                 });
             });
         }
     }, []);
 
-    if (location.lat && location.lng) {
-        const fetchGeocoding = async (location) => {
-            const address = await ReverseGeocoding(location);
-            console.log(address);
-        }
-
-        fetchGeocoding(location);
-    }
-
-
     return (
-        <UserContext.Provider value={{ user, activeItem, setActiveItem, location }}>
+        <UserContext.Provider value={{ user, activeItem, setActiveItem, location}}>
             {children}
         </UserContext.Provider>
     );

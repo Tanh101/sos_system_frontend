@@ -1,50 +1,34 @@
 import { useState } from "react";
 import { Marker, InfoWindow } from "@react-google-maps/api";
+import PropTypes from "prop-types";
 
-export default function PlaceInfo() {
-    const userPlace = {
-        info: "40 Ngô Sĩ Liên Đà Nẵng",
-        location: { lat: 16.073460, lng: 108.151466 }
+import {
+    rescuerMarkerIconURL,
+    userMarkerIconURL
+} from "../../constants/config";
 
-    }
-
-    const places = [
-        {
-            info: "264 Hoàng Văn Thái, Đà Nẵng",
-            location: {
-                lat: 16.058810,
-                lng: 108.15122
-            }
-        },
-        {
-            info: "20 Nguyễn Đình Trân, Đà Nẵng",
-            location: { lat: 16.018810, lng: 108.255480 }
-        },
-        {
-            info: "20 Phan Hành Sơn, Đà Nẵng",
-            location: { lat: 16.043860, lng: 108.239630 }
-        }
-    ];
+const PlaceInfo = ({ userPlace, rescuerPlaces }) => {
 
     const [selected, setSelected] = useState(null);
 
     return (
         <>
-            {places.map((marker) => (
+            {rescuerPlaces.map((marker) => (
                 <Marker
                     key={`${marker.location.lat * marker.location.lng}`}
                     position={{
                         lat: marker.location.lat,
                         lng: marker.location.lng
                     }}
-                    onMouseOver={() => {
+                    onClick={() => {
                         setSelected(marker);
                     }}
                     icon={{
-                        url: "https://sossystem.s3.amazonaws.com/hopitalmarker.png",
+                        url: rescuerMarkerIconURL,
                         origin: new window.google.maps.Point(0, 0),
                         scaledSize: new window.google.maps.Size(40, 40)
                     }}
+
                 />
             ))}
 
@@ -53,16 +37,15 @@ export default function PlaceInfo() {
                     lat: userPlace.location.lat,
                     lng: userPlace.location.lng
                 }}
-                onMouseOver={() => {
+                onClick={() => {
                     setSelected(userPlace);
                 }}
                 icon={{
-                    url: "https://sossystem.s3.amazonaws.com/image.png",
+                    url: userMarkerIconURL,
                     origin: new window.google.maps.Point(0, 0),
                     scaledSize: new window.google.maps.Size(40, 40)
                 }}
             />
-
 
             {selected ? (
                 <InfoWindow
@@ -80,3 +63,10 @@ export default function PlaceInfo() {
         </>
     );
 }
+export default PlaceInfo;
+
+PlaceInfo.propTypes = {
+    userPlace: PropTypes.object.isRequired,
+    rescuerPlaces: PropTypes.array.isRequired,
+    isDraggable: PropTypes.bool,
+};
