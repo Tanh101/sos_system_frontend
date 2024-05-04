@@ -18,6 +18,18 @@ const EmergencyMapContainerStyle = {
     height: "40vh",
     width: "100%"
 }
+const fullWindowMapContainerStyle = {
+    height: "100vh",
+    width: "100%"
+}
+
+const googleMapComponentOptions = {
+    disableDefaultUI: true,
+    zoomControl: true
+};
+const mapLibraries = ["places"];
+
+const googleMapApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export {
     AppBaseUrl,
@@ -27,4 +39,8 @@ export {
     rescuerMarkerIconURL,
     userMarkerIconURL,
     EmergencyMapContainerStyle,
+    fullWindowMapContainerStyle,
+    googleMapComponentOptions,
+    mapLibraries,
+    googleMapApiKey,
 }

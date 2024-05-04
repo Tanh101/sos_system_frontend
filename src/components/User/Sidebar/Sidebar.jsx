@@ -6,7 +6,7 @@ import { UserContext } from '../../../Context/UserContext/UserContext';
 
 const Sidebar = () => {
     const { activeItem, setActiveItem } = useContext(UserContext);
-    
+
     const handleItemClick = (item) => {
         setActiveItem(item);
     };
@@ -17,7 +17,6 @@ const Sidebar = () => {
             <SidebarItem link="/location" icon={faLocationDot} title="Định vị" active={activeItem === 'location'} onClick={() => handleItemClick('location')} />
             <SidebarItem link="/" icon={faTowerBroadcast} title="Khẩn cấp" active={activeItem === 'home'} onClick={() => handleItemClick('home')} />
             <SidebarItem link="/messages" icon={faMessage} title="Tin nhắn" active={activeItem === 'messages'} onClick={() => handleItemClick('messages')} />
-            <SidebarItem link="/notifications" icon={faBell} title="Thông báo" active={activeItem === 'notifications'} onClick={() => handleItemClick('notifications')} />
         </div >
     )
 }

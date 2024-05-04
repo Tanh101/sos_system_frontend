@@ -1,49 +1,32 @@
-import { useCallback, useContext, useRef } from "react";
-import { GoogleMap, useLoadScript } from "@react-google-maps/api";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import PropTypes from "prop-types";
 
 import { UserContext } from "../../Context/UserContext/UserContext";
 import PlaceInfo from "./PlaceInfo";
 import Loading from "../Loading/Loading";
-
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-const libraries = ["places"];
-
-const options = {
-    disableDefaultUI: true,
-    zoomControl: true
-};
+import PlaceService from "../../services/PlaceService";
+import { googleMapComponentOptions, mapLibraries, googleMapApiKey } from "../../constants/config";
 
 const MyMapComponent = ({ mapContainerStyle }) => {
+    const { getRescuerPlaces } = PlaceService();
 
     const { location } = useContext(UserContext);
 
-    const userPlace = {
-        info: location.address,
-        location: { lat: location.lat, lng: location.lng }
-    }
+    const [rescuerPlaces, setRescuerPlaces] = useState([]);
 
-    const rescuerPlaces = [
-        {
-            info: "264 Hoàng Văn Thái, Đà Nẵng",
-            location: {
-                lat: 16.058810,
-                lng: 108.15122
-            }
-        },
-        {
-            info: "20 Nguyễn Đình Trân, Đà Nẵng",
-            location: { lat: 16.018810, lng: 108.255480 }
-        },
-        {
-            info: "20 Phan Hành Sơn, Đà Nẵng",
-            location: { lat: 16.043860, lng: 108.239630 }
+    useEffect(() => {
+        const fetchRescuerPlaces = async () => {
+            const response = await getRescuerPlaces();
+            setRescuerPlaces(response);
         }
-    ];
 
-    const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: apiKey,
-        libraries
+        fetchRescuerPlaces();
+    }, []);
+
+    const { isLoaded, loadError } = useJsApiLoader({
+        googleMapsApiKey: googleMapApiKey,
+        libraries: mapLibraries
     });
 
     const mapRef = useRef();
@@ -52,12 +35,11 @@ const MyMapComponent = ({ mapContainerStyle }) => {
         mapRef.current = map;
     }, []);
 
-    if (loadError) return "Error";
-    if (!isLoaded) return "Loading...";
+    if (!isLoaded) return <Loading />;
+    if (loadError) return "Error loading map";
 
     return (
         location.lat && location.lng ? (
-
             <GoogleMap
                 id="map"
                 mapContainerStyle={mapContainerStyle}
@@ -66,11 +48,11 @@ const MyMapComponent = ({ mapContainerStyle }) => {
                     lat: location.lat,
                     lng: location.lng
                 }}
-                options={options}
+                options={googleMapComponentOptions}
                 onLoad={onMapLoad}
             >
                 <PlaceInfo
-                    userPlace={userPlace}
+                    userPlace={{ info: location.address, location: { lat: location.lat, lng: location.lng } }}
                     rescuerPlaces={rescuerPlaces}
                     isDraggable={false} />
             </GoogleMap>
@@ -81,3 +63,7 @@ const MyMapComponent = ({ mapContainerStyle }) => {
 }
 
 export default MyMapComponent;
+
+MyMapComponent.propTypes = {
+    mapContainerStyle: PropTypes.object.isRequired
+}
