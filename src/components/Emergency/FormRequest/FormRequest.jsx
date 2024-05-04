@@ -1,19 +1,21 @@
-import { useContext, useEffect, useRef } from "react"
+import { useContext } from "react"
 import { faArrowRight, faLocationDot } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import "./FormRequest.css"
-import { UserContext } from "../../../Context/UserContext/UserContext"
 import emergencyRequestSchema from "../../../validations/emergencyRequestSchema";
 import RequestMap from "../RequestMap/RequestMap";
 import { EmergencyMapContainerStyle } from "../../../constants/config";
 import { UserMarkerPlaceContext } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
+import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 
 const schema = emergencyRequestSchema
 
 const FormRequest = () => {
+    const { requestLocation } = useContext(UserMarkerPlaceContext);
+
     const { handleSubmit,
         register,
         formState: { errors }
@@ -26,13 +28,13 @@ const FormRequest = () => {
         console.log(content, requestLocation.address, requestType, requestLocation.lat, requestLocation.lng);
     }
 
-    const { requestLocation } = useContext(UserMarkerPlaceContext);
 
-    const handleAddressChange = (e) => {
-        e.preventDefault();
-        const address = e.target.value;
+    // const handleAddressChange = (e) => {
+    //     e.preventDefault();
+    //     const address = e.target.value;
+    //     // setRequestLocation({ ...requestLocation, address: address });
+    // };
 
-    };
     const handleSubmitAddress = () => {
         console.log("submit address");
     }
@@ -41,17 +43,10 @@ const FormRequest = () => {
         <div className='bg-white items-center justify-center rounded-lg shadow-lg px-6 pb-6 min-w-96 w-full'>
             <form className="flex flex-col rounded-xl" onSubmit={handleSubmit(formSubmit)}>
                 <div className="flex lg:flex-row flex-col justify-start lg:items-center items-start my-5">
-                    <label className="lg:mr-4 font-semibold" htmlFor="address">Nhập địa chỉ của bạn</label>
-                    <div className='flex border rounded-xl px-2 justify-between items-center shadow-md w-full' >
+                    <label className="mr-2 min-w-14 font-semibold" htmlFor="address">Nhập địa chỉ của bạn</label>
+                    <div className='flex border rounded-xl px-2 mx-2 justify-between items-center shadow-md' >
                         <FontAwesomeIcon icon={faLocationDot} color="red" />
-                        <input
-                            placeholder="Enter your address"
-                            className={`outline-none px-3 py-2 w-full ${errors.address ? "border-red-500" : ""
-                                }`}
-                            id="search-input"
-                            value={requestLocation.address}
-                            onChange={handleAddressChange}
-                        />
+                        <LocationSearchInput />
                         <button className="flex justify-center items-center bg-red-500 w-8 h-8 rounded-full"
                             type="button"
                             onClick={handleSubmitAddress}>
@@ -62,7 +57,6 @@ const FormRequest = () => {
                 <div className="flex flex-col mt-2">
                     <RequestMap mapContainerStyle={EmergencyMapContainerStyle} />
                     <div className="flex flex-col justify-between">
-
                         <div className="flex my-5 flex-wrap">
                             <div className="flex w-44 flex-wrap">
                                 <label className="mr-5 font-semibold" htmlFor="about">Loại hỗ trợ</label>
@@ -85,12 +79,12 @@ const FormRequest = () => {
                                 <p className="text-red">{errors.requestType.message}</p>
                             </div>}
                         </div>
-                        <div className="flex lg:flex-row flex-col my-5 flex-wrap">
+                        <div className="flex flex-1 lg:flex-row flex-col my-5 flex-wrap">
                             <div className="flex w-44 flex-wrap">
                                 <label className="mr-5 font-semibold" htmlFor="about">Nội dung cần hỗ trợ</label>
                             </div>
 
-                            <textarea className="outline-none p-2 border focus:border-[#F73334] focus:border-2 rounded-xl"
+                            <textarea className="outline-none p-2 border focus:border-[#F73334] focus:border-2 rounded-xl w-full"
                                 id="about"
                                 name="about"
                                 rows={4}

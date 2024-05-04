@@ -68,5 +68,4 @@ export default PlaceInfo;
 PlaceInfo.propTypes = {
     userPlace: PropTypes.object.isRequired,
     rescuerPlaces: PropTypes.array.isRequired,
-    isDraggable: PropTypes.bool,
 };

@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GoogleMap, useLoadScript } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 
 import Loading from "../../Loading/Loading";
 import PlaceInfo from "./PlaceInfo";
@@ -34,7 +34,7 @@ const RequestMap = ({ mapContainerStyle }) => {
         fetchRescuerPlaces();
     }, []);
 
-    const { isLoaded, loadError } = useLoadScript({
+    const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: apiKey,
         libraries
     });

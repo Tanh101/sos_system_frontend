@@ -10,7 +10,9 @@ const Help = () => {
     }, []);
 
     return (
-        <div>Help</div>
+        <div className="flex flex-1 w-full h-screen bg-white justify-center items-center">
+            Help
+        </div>
     )
 }
 
