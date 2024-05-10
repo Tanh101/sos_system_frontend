@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useJsApiLoader } from "@react-google-maps/api";
 import PlacesAutocomplete, {
     geocodeByAddress,
@@ -9,10 +9,10 @@ import { googleMapApiKey, mapLibraries } from '../../../constants/config';
 import { Toastify } from '../../../toastify/Toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons/faLocationDot';
+import { UserMarkerPlaceContext } from '../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext';
 
 const LocationSearchInput = () => {
-
-    const [address, setAddress] = useState('');
+    const { requestLocation, setRequestLocation } = useContext(UserMarkerPlaceContext);
 
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: googleMapApiKey,
@@ -21,18 +21,15 @@ const LocationSearchInput = () => {
 
     if (!isLoaded) return <div>Loading...</div>;
 
-
     const handleChange = address => {
-        setAddress(address);
+        setRequestLocation({ ...requestLocation, address: address });
     };
 
     const handleSelect = address => {
-        setAddress(address);
         geocodeByAddress(address)
             .then(results => getLatLng(results[0]))
             .then((latLng) => {
-                console.log('Success', latLng);
-
+                setRequestLocation({ lat: latLng.lat, lng: latLng.lng, address: address });
             })
             .catch(() => {
                 Toastify.error("Please select a valid location");
@@ -41,7 +38,7 @@ const LocationSearchInput = () => {
 
     return (
         <PlacesAutocomplete
-            value={address}
+            value={requestLocation.address}
             onChange={handleChange}
             onSelect={handleSelect}
         >
