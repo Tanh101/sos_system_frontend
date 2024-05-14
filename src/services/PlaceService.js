@@ -3,7 +3,7 @@ import ErrorProcessService from "./ErrorProcessService";
 function PlaceService() {
     const { errorProcessor } = ErrorProcessService();
 
-    const getAnotherUserRequestPlaces = async () => {
+    const getAnotherUserRequestPlaces = async() => {
         try {
             // Add your code here
         } catch (error) {
@@ -11,7 +11,7 @@ function PlaceService() {
         }
     }
 
-    const getRescuerPlaces = async () => {
+    const getRescuerPlaces = async() => {
         try {
             // const response = await api.get(`/places/rescuer`, {
             //     params: {
@@ -20,8 +20,7 @@ function PlaceService() {
             //     },
             // });
 
-            const rescuerPlaces = [
-                {
+            const rescuerPlaces = [{
                     info: "264 Hoàng Văn Thái, Đà Nẵng",
                     location: {
                         lat: 16.058810,

@@ -8,7 +8,7 @@ const RequestService = () => {
 
     const { errorProcessor } = ErrorProcessService();
 
-    const getRequestType = async () => {
+    const getRequestType = async() => {
         try {
             const response = await api.get('/type');
             if (response.status === 200) {
@@ -20,7 +20,7 @@ const RequestService = () => {
         }
     }
 
-    const createEmergencyRequest = async (data) => {
+    const createEmergencyRequest = async(data) => {
         try {
             const response = await api.post('/requests', {
                 requestTypeId: data.requestType,
@@ -42,9 +42,53 @@ const RequestService = () => {
         }
     }
 
+    const processRequestResponse = (data) => {
+        try {
+            return data.map((item) => {
+                return {
+                    id: item.id,
+                    requestType: item.requestTypes.name,
+                    content: item.content,
+                    address: item.address,
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    status: item.status,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt,
+                    media: item.requestMedia,
+                    user: item.users,
+                    isEmergency: item.isEmergency,
+                    voteCount: item.voteCount,
+                }
+            });
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const getRequests = async() => {
+        try {
+            const response = await api.get('/requests');
+            if (response.status === 200) {
+                const requests = processRequestResponse(response.data.requests);
+                const pagination = response.data.paginations;
+                return {
+                    requests,
+                    pagination,
+
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
     return {
         getRequestType,
         createEmergencyRequest,
+        getRequests,
     };
 }
 
