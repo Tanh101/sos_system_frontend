@@ -3,21 +3,28 @@ import { faArrowRight, faLocationDot } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import io from 'socket.io-client';
 
 import "./FormRequest.css"
 import emergencyRequestSchema from "../../../validations/emergencyRequestSchema";
 import RequestMap from "../RequestMap/RequestMap";
-import { EmergencyMapContainerStyle } from "../../../constants/config";
+import { ServerURL, EmergencyMapContainerStyle } from "../../../constants/config";
 import { UserMarkerPlaceContext } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
 import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 import RequestService from "../../../services/RequestService";
 import Loading from "../../Loading/Loading";
 
-const schema = emergencyRequestSchema
+const schema = emergencyRequestSchema;
+const socket = io(ServerURL)
 
 const FormRequest = () => {
     const { requestLocation } = useContext(UserMarkerPlaceContext);
+
     const { getRequestType, createEmergencyRequest } = RequestService();
+
+    const [response, setResponse] = useState(null);
+    console.log(response);
+
     const [requestType, setRequestType] = useState([]);
 
     const { handleSubmit,
@@ -27,8 +34,13 @@ const FormRequest = () => {
         resolver: yupResolver(schema),
     });
 
+    const handleProcessSocket = (requestData) => {
+        socket.emit('clientRequest', requestData);
+    }
+
     const formSubmit = async (data) => {
         const { content, requestType } = data;
+        handleProcessSocket({ content, requestType, ...requestLocation });
         await createEmergencyRequest({ content, requestType, ...requestLocation })
     }
 
@@ -40,6 +52,18 @@ const FormRequest = () => {
 
         fetchRequestType();
     }, [])
+
+    useEffect(() => {
+        socket.on('responseFromRescuer', (data) => {
+            console.log('recuseFromRescuer', data);
+            setResponse(data);
+        });
+
+        return () => {
+            socket.off('responseFromRescuer');
+        };
+    }, []);
+
 
     return (
         <>

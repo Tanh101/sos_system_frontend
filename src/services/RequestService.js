@@ -33,7 +33,7 @@ const RequestService = () => {
 
             if (response.status === 200) {
                 Toastify.success("Yêu cầu của bạn đã được gửi đi");
-                navigate('/help');
+                // navigate('/help');
                 return response.data;
             }
         } catch (error) {

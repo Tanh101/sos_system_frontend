@@ -48,7 +48,6 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
-
     return (
         <div className='flex justify-between shadow-xl border-b items-center bg-white font-poppins'>
             <div className='mx-10 font-semibold text-xl'>

@@ -19,6 +19,7 @@ export const UserProvider = ({ children }) => {
         }
 
         fetchUserProfile();
+        
     }, []);
 
     useEffect(() => {
