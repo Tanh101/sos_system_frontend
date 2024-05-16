@@ -32,6 +32,14 @@ const mapLibraries = ["places"];
 
 const googleMapApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+const socketMessage = {
+    CLIENT_REQUEST: "clientRequest",
+    RESPONSE_FROM_RESCUER: "responseFromRescuer",
+    RESCUER_JOIN: "rescuerJoin",
+    NEW_REQUEST: "newRequest",
+    RESCUER_RESPONSE: "rescuerResponse",
+}
+
 export {
     AppBaseUrl,
     SPACE_CHARACTER,
@@ -45,4 +53,5 @@ export {
     mapLibraries,
     googleMapApiKey,
     ServerURL,
+    socketMessage,
 }
