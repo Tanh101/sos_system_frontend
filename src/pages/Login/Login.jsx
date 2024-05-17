@@ -81,6 +81,7 @@ const Login = () => {
                                     placeholder="Enter your password"
                                     id="password"
                                     name="password"
+                                    autoComplete="on"
                                     {...register("password")}
                                 />
                                 {errors?.password && (
@@ -101,6 +102,7 @@ const Login = () => {
                                     placeholder="Enter your password"
                                     id="password"
                                     name="password"
+                                    autoComplete="on"
                                     {...register("password")}
                                 />
                             </div>

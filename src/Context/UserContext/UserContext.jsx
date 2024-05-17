@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from 'react';
+
 import AuthService from '../../services/AuthService';
 import GoogleMapService from '../../services/GoogleMapService';
 
@@ -48,7 +49,7 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, activeItem, setActiveItem, location}}>
+        <UserContext.Provider value={{ user, activeItem, setActiveItem, location }}>
             {children}
         </UserContext.Provider>
     );
