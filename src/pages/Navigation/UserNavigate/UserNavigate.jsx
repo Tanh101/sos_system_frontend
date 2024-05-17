@@ -12,12 +12,13 @@ const RequestHistories = React.lazy(() => import("../../../components/RequestHis
 const Help = React.lazy(() => import("../../../components/Help/Help"));
 const Location = React.lazy(() => import("../../../components/Location/Location"));
 const Inbox = React.lazy(() => import("../../../components/Inbox/Inbox"));
+const Profile = React.lazy(() => import("../../../components/Profile/Profile"));
 
 const UserNavigation = () => {
     return (
         <LocaleProvider>
             <UserProvider>
-                <div className="flex fixed w-full h-screen">
+                <div className="flex fixed w-full h-screen font-poppins">
                     <div className="flex bg-[#F9FAFB] flex-col flex-1">
                         <Navbar />
                         <div className="flex">
@@ -29,6 +30,7 @@ const UserNavigation = () => {
                                     <Route path="/location" element={<Location />} />
                                     <Route path="/" element={<Home />} />
                                     <Route path="/messages" element={<Inbox />} />
+                                    <Route path="/profile" element={<Profile />} />
                                 </Routes>
                             </Suspense>
                         </div>
