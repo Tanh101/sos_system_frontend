@@ -1,5 +1,7 @@
-const AppBaseUrl = import.meta.env.VITE_REACT_APP_API ?? 'http://localhost:8000/api';
-const ServerURL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000'
+const AppBaseUrl =
+    import.meta.env.VITE_REACT_APP_API ? ? 'http://localhost:8000/api';
+const ServerURL =
+    import.meta.env.VITE_SERVER_URL ? ? 'http://localhost:8000'
 const SPACE_CHARACTER = '\u00A0';
 const defaultMapConfig = {
     gestureHandling: "greedy",
@@ -30,7 +32,8 @@ const googleMapComponentOptions = {
 };
 const mapLibraries = ["places"];
 
-const googleMapApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const googleMapApiKey =
+    import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const socketMessage = {
     CLIENT_REQUEST: "clientRequest",

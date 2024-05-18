@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import "./FormRequest.css"
 import emergencyRequestSchema from "../../../validations/emergencyRequestSchema";
 import RequestMap from "../RequestMap/RequestMap";
-import { EmergencyMapContainerStyle } from "../../../constants/config";
+import { ServerURL, EmergencyMapContainerStyle } from "../../../constants/config";
 import { UserMarkerPlaceContext } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
 import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 import RequestService from "../../../services/RequestService";
