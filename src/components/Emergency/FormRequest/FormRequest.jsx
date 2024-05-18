@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import "./FormRequest.css"
 import emergencyRequestSchema from "../../../validations/emergencyRequestSchema";
 import RequestMap from "../RequestMap/RequestMap";
-import { ServerURL, EmergencyMapContainerStyle } from "../../../constants/config";
+import { EmergencyMapContainerStyle } from "../../../constants/config";
 import { UserMarkerPlaceContext } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
 import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 import RequestService from "../../../services/RequestService";
@@ -20,6 +20,7 @@ const schema = emergencyRequestSchema;
 const FormRequest = () => {
     const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
     const { t } = useTranslation();
+    const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
 
     const { requestLocation } = useContext(UserMarkerPlaceContext);
 

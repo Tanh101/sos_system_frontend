@@ -57,4 +57,5 @@ export {
     googleMapApiKey,
     ServerURL,
     socketMessage,
+    socketMessage,
 }
