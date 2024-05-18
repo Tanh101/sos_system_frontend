@@ -11,17 +11,23 @@ import { LocaleContext } from '../../Context/LocaleContext/LocaleContext';
 
 const Navbar = () => {
     const { t } = useTranslation();
+
     const { handleChangeLanguage, currentLanguage } = useContext(LocaleContext);
-    const count = 10;
+    const { user, receiveEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
 
-    const userContext = useContext(UserContext);
-    const { logout } = AuthService();
-
+    const [count, setCount] = useState(1);
+    const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    const { logout } = AuthService();
+
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const toggleNoti = () => {
+        setIsOpen(!isOpen);
     };
 
     const handleClickOutside = (event) => {
@@ -45,14 +51,20 @@ const Navbar = () => {
         };
     }, []);
 
-    const [isOpen, setIsOpen] = useState(false);
-
-    const toggleNoti = () => {
-        setIsOpen(!isOpen);
-    };
+    useEffect(() => {
+        if (user && user.role === 'rescuer') {
+            receiveEmergencyRequest((data) => {
+                setCount(prevCount => prevCount + 1);
+            });
+        } else if (user && user.role === 'user') {
+            receiveResponseFromRescuer((data) => {
+                setCount(prevCount => prevCount + 1);
+            });
+        }
+    }, [user]);
 
     return (
-        <div className='flex justify-between shadow-xl border-b items-center bg-white font-poppins'>
+        <div className='flex justify-between shadow-xl border-b items-center bg-white'>
             <div className='mx-10 font-semibold text-xl'>
                 <Logo />
             </div>
@@ -74,8 +86,8 @@ const Navbar = () => {
                         <img className='object-cover w-12 h-12 cursor-pointer' loading='lazy' src={avatar} alt="" />
                     </div>
                     <div className='flex justify-between flex-1 flex-col mx-5 font-semibold cursor-pointer'>
-                        <p className='font-semibold'>{userContext?.user?.name}</p>
-                        <p className='text-sm font-normal'>{userContext?.user?.email}</p>
+                        <p className='font-semibold'>{user?.name}</p>
+                        <p className='text-sm font-normal'>{user?.email}</p>
                     </div>
                     {isDropdownOpen && (
                         <div className="absolute top-full right-4 mt-3 w-48 bg-white rounded-md rounded-t-none shadow-lg z-50">

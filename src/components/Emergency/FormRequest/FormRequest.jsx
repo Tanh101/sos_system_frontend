@@ -43,8 +43,10 @@ const FormRequest = () => {
 
     const formSubmit = async (data) => {
         const { content, requestType } = data;
-        handleProcessSocket({ content, requestType, ...requestLocation });
-        await createEmergencyRequest({ content, requestType, ...requestLocation })
+        const response = await createEmergencyRequest({ content, requestType, ...requestLocation })
+        if (response) {
+            handleProcessSocket({ content, requestType, ...requestLocation });
+        }
     }
 
     useEffect(() => {

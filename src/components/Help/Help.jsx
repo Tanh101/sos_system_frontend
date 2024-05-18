@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import Post from "./Post/Post";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { Route, Routes } from 'react-router-dom';
+
 import { UserContext } from "../../Context/UserContext/UserContext";
 import RequestService from "../../services/RequestService";
 import Loading from "../Loading/Loading";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import Post from "./Post/Post";
 
 const Help = () => {
     const { getRequests } = RequestService();
@@ -69,7 +71,13 @@ const Help = () => {
                             <button className="p-2 bg-red-600 text-white rounded-2xl">Create request</button>
                         </div>
                     </div>
-                    <Post requestData={requests} />
+                    {!requests && <div className='flex justify-center items-center h-96'>
+                        <p className='text-2xl'>No requests available</p>
+                    </div>
+                    }
+                    {requests && requests?.requests?.length && requests.requests.map((item, index) => (
+                        <Post item={item} key={index} />
+                    ))}
                 </div>
             </div>
         </div>

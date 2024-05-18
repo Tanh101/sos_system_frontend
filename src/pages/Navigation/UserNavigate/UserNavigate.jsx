@@ -18,14 +18,14 @@ const UserNavigation = () => {
     return (
         <LocaleProvider>
             <UserProvider>
-                <div className="flex fixed w-full h-screen">
+                <div className="flex fixed w-full h-screen font-roboto">
                     <div className="flex bg-[#F9FAFB] flex-col flex-1">
                         <Navbar />
                         <div className="flex">
                             <Sidebar />
                             <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
                                 <Routes>
-                                    <Route path="/help" element={<Help />} />
+                                    <Route path="/help/*" element={<Help />} />
                                     <Route path="/requests" element={<RequestHistories />} />
                                     <Route path="/location" element={<Location />} />
                                     <Route path="/" element={<Home />} />

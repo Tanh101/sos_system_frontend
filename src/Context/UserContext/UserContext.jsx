@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 
 import GoogleMapService from '../../services/GoogleMapService';
-import AuthService from '../../services/AuthService';
 import SocketService from '../../services/SocketService';
 
 export const UserContext = createContext();
