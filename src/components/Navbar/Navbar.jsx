@@ -1,17 +1,20 @@
 import { useState, useRef, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import avatar from '../../assets/imgs/avatar.png';
 import AuthService from '../../services/AuthService';
 import Notification from '../Notification/Notification';
 import Logo from '../Logo/Logo';
 import { UserContext } from '../../Context/UserContext/UserContext';
+import { LocaleContext } from '../../Context/LocaleContext/LocaleContext';
 
 const Navbar = () => {
+    const { t } = useTranslation();
+    const { handleChangeLanguage, currentLanguage } = useContext(LocaleContext);
     const count = 10;
 
-    const userContext = useContext(UserContext)
-
+    const userContext = useContext(UserContext);
     const { logout } = AuthService();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -33,7 +36,7 @@ const Navbar = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         logout();
-    }
+    };
 
     useEffect(() => {
         window.addEventListener('click', handleClickOutside);
@@ -54,7 +57,14 @@ const Navbar = () => {
                 <Logo />
             </div>
             <div className="flex justify-center items-center">
-                <div className="flex flex-row relative mx-10" >
+                <div className="flex rounded-lg bg-slate-300 border-2">
+                    <select className='outline-none focus:border-red-600 focus:border-2 rounded-lg'
+                        onChange={handleChangeLanguage} value={currentLanguage}>
+                        <option value="vn">Vn</option>
+                        <option value="en">En</option>
+                    </select>
+                </div>
+                <div className="flex flex-row relative mx-10">
                     <div className="flex Notification" onClick={toggleNoti}>
                         <Notification count={count} />
                     </div>
@@ -70,9 +80,9 @@ const Navbar = () => {
                     {isDropdownOpen && (
                         <div className="absolute top-full right-4 mt-3 w-48 bg-white rounded-md rounded-t-none shadow-lg z-50">
                             <div className="py-1">
-                                <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#F73334] hover:text-white" to={"supports"}>Profile</Link>
+                                <Link className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#F73334] hover:text-white" to={"profile"}>{t("Hồ sơ cá nhân")}</Link>
                                 <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#F73334] hover:text-white" onClick={handleSubmit}>
-                                    <button type="button">Logout</button>
+                                    <button type="button">{t("Đăng xuất")}</button>
                                 </div>
                             </div>
                         </div>
