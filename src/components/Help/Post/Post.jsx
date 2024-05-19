@@ -10,7 +10,7 @@ import 'reactjs-popup/dist/index.css';
 import avatar from '../../../assets/imgs/avatar.png';
 import RequestService from '../../../services/RequestService';
 import { Toastify } from '../../../toastify/Toastify';
-import PostDetail from '../../PostDetail/PostDetail';
+import PostDetail from '../PostDetail/PostDetail';
 
 const Post = ({ item }) => {
     const navigate = useNavigate();
@@ -154,7 +154,7 @@ const Post = ({ item }) => {
                     contentStyle={{ borderRadius: '10px' }}
                 >
                     {close => (
-                        <PostDetail />
+                        <PostDetail close={close} />
                     )}
                 </Popup>
             )}

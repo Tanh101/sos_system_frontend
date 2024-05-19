@@ -21,6 +21,7 @@ const UserNavigation = () => {
                 <div className="flex fixed w-full h-screen font-roboto">
                     <div className="flex bg-[#F9FAFB] flex-col flex-1">
                         <Navbar />
+                        <Chatbot />
                         <div className="flex">
                             <Sidebar />
                             <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>

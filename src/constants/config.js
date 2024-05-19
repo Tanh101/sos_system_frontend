@@ -1,7 +1,7 @@
-const AppBaseUrl =
-    import.meta.env.VITE_REACT_APP_API ? ? 'http://localhost:8000/api';
-const ServerURL =
-    import.meta.env.VITE_SERVER_URL ? ? 'http://localhost:8000'
+const AppBaseUrl = import.meta.env.VITE_REACT_APP_API ?? 'http://localhost:8000/api';
+
+const ServerURL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
+
 const SPACE_CHARACTER = '\u00A0';
 const defaultMapConfig = {
     gestureHandling: "greedy",
@@ -56,6 +56,5 @@ export {
     mapLibraries,
     googleMapApiKey,
     ServerURL,
-    socketMessage,
     socketMessage,
 }

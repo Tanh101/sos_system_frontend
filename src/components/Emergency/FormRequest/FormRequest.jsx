@@ -18,7 +18,6 @@ import { UserContext } from "../../../Context/UserContext/UserContext";
 const schema = emergencyRequestSchema;
 
 const FormRequest = () => {
-    const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
     const { t } = useTranslation();
     const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
 
@@ -43,10 +42,8 @@ const FormRequest = () => {
 
     const formSubmit = async (data) => {
         const { content, requestType } = data;
-        const response = await createEmergencyRequest({ content, requestType, ...requestLocation })
-        if (response) {
-            handleProcessSocket({ content, requestType, ...requestLocation });
-        }
+        handleProcessSocket({ content, requestType, ...requestLocation });
+        await createEmergencyRequest({ content, requestType, ...requestLocation })
     }
 
     useEffect(() => {
