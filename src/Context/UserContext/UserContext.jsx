@@ -1,13 +1,23 @@
 import { createContext, useEffect, useState } from 'react';
 
-import AuthService from '../../services/AuthService';
 import GoogleMapService from '../../services/GoogleMapService';
+import SocketService from '../../services/SocketService';
+import AuthService from '../../services/AuthService';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const { getUserProfile } = AuthService();
+
     const { ReverseGeocoding } = GoogleMapService();
+
+    const {
+        notifyRescuerJoin,
+        receiveEmergencyRequest,
+        sendEmergencyRequest,
+        receiveResponseFromRescuer,
+        sendResponseToClient
+    } = SocketService();
 
     const [user, setUser] = useState({});
     const [activeItem, setActiveItem] = useState('home');
@@ -48,8 +58,23 @@ export const UserProvider = ({ children }) => {
         }
     }, []);
 
+    useEffect(() => {
+        if (user && user.role === 'rescuer') {
+            notifyRescuerJoin(user._id);
+        }
+    }, [user]);
+
     return (
-        <UserContext.Provider value={{ user, activeItem, setActiveItem, location }}>
+        <UserContext.Provider value={{
+            user,
+            activeItem,
+            setActiveItem,
+            location,
+            sendEmergencyRequest,
+            receiveEmergencyRequest,
+            receiveResponseFromRescuer,
+            sendResponseToClient,
+        }}>
             {children}
         </UserContext.Provider>
     );

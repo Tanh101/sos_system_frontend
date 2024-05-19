@@ -8,9 +8,9 @@ const RequestService = () => {
 
     const { errorProcessor } = ErrorProcessService();
 
-    const getRequestType = async() => {
+    const getRequestType = async () => {
         try {
-            const response = await api.get('/type');
+            const response = await api.get("/type");
             if (response.status === 200) {
                 return response.data;
             }
@@ -18,11 +18,11 @@ const RequestService = () => {
             console.log(error);
             errorProcessor(error);
         }
-    }
+    };
 
-    const createEmergencyRequest = async(data) => {
+    const createEmergencyRequest = async (data) => {
         try {
-            const response = await api.post('/requests', {
+            const response = await api.post("/requests", {
                 requestTypeId: data.requestType,
                 content: data.content,
                 latitude: data.lat,
@@ -33,14 +33,15 @@ const RequestService = () => {
 
             if (response.status === 200) {
                 Toastify.success("Yêu cầu của bạn đã được gửi đi");
-                navigate('/help');
+                navigate("/help");
                 return response.data;
             }
         } catch (error) {
             console.log(error);
             errorProcessor(error);
+            return null;
         }
-    }
+    };
 
     const processRequestResponse = (data) => {
         try {
@@ -59,25 +60,35 @@ const RequestService = () => {
                     user: item.users,
                     isEmergency: item.isEmergency,
                     voteCount: item.voteCount,
-                }
+                };
             });
-
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
-    const getRequests = async() => {
+    const getRequests = async () => {
         try {
-            const response = await api.get('/requests');
+            const response = await api.get("/requests");
             if (response.status === 200) {
                 const requests = processRequestResponse(response.data.requests);
                 const pagination = response.data.paginations;
                 return {
                     requests,
                     pagination,
+                };
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    };
 
-                }
+    const upvotePost = async (id) => {
+        try {
+            const response = await api.post(`/requests/${id}/vote`);
+            if (response.status === 200) {
+                return response.data.voteCount;
             }
         } catch (error) {
             console.log(error);
@@ -85,11 +96,25 @@ const RequestService = () => {
         }
     }
 
+    const downvotePost = async (id) => {
+        try {
+            const response = await api.delete(`/requests/${id}/vote`);
+            if (response.status === 200) {
+                return response.data.voteCount;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    };
+
     return {
         getRequestType,
         createEmergencyRequest,
         getRequests,
+        upvotePost,
+        downvotePost,
     };
-}
+};
 
 export default RequestService;

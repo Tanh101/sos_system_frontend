@@ -13,14 +13,20 @@ import { UserMarkerPlaceContext } from "../../../Context/UserMarkerPlaceContext/
 import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 import RequestService from "../../../services/RequestService";
 import Loading from "../../Loading/Loading";
+import { UserContext } from "../../../Context/UserContext/UserContext";
 
-const schema = emergencyRequestSchema
+const schema = emergencyRequestSchema;
 
 const FormRequest = () => {
     const { t } = useTranslation();
+    const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
 
     const { requestLocation } = useContext(UserMarkerPlaceContext);
+
     const { getRequestType, createEmergencyRequest } = RequestService();
+
+    const [response, setResponse] = useState(null);
+
     const [requestType, setRequestType] = useState([]);
 
     const { handleSubmit,
@@ -30,8 +36,13 @@ const FormRequest = () => {
         resolver: yupResolver(schema),
     });
 
+    const handleProcessSocket = (requestData) => {
+        sendEmergencyRequest(requestData);
+    }
+
     const formSubmit = async (data) => {
         const { content, requestType } = data;
+        handleProcessSocket({ content, requestType, ...requestLocation });
         await createEmergencyRequest({ content, requestType, ...requestLocation })
     }
 
@@ -43,6 +54,13 @@ const FormRequest = () => {
 
         fetchRequestType();
     }, [])
+
+    useEffect(() => {
+        receiveResponseFromRescuer((data) => {
+            console.log('Response from rescuer:', data);
+            setResponse(data);
+        });
+    }, []);
 
     return (
         <>

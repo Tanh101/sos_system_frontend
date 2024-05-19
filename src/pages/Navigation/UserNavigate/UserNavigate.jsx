@@ -12,19 +12,21 @@ const RequestHistories = React.lazy(() => import("../../../components/RequestHis
 const Help = React.lazy(() => import("../../../components/Help/Help"));
 const Location = React.lazy(() => import("../../../components/Location/Location"));
 const Inbox = React.lazy(() => import("../../../components/Inbox/Inbox"));
+const Chatbot = React.lazy(() => import("../../../components/Chatbot/Chatbot"));
 
 const UserNavigation = () => {
     return (
         <LocaleProvider>
             <UserProvider>
-                <div className="flex fixed w-full h-screen">
+                <div className="flex fixed w-full h-screen font-roboto">
                     <div className="flex bg-[#F9FAFB] flex-col flex-1">
                         <Navbar />
+                        <Chatbot />
                         <div className="flex">
                             <Sidebar />
                             <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
                                 <Routes>
-                                    <Route path="/help" element={<Help />} />
+                                    <Route path="/help/*" element={<Help />} />
                                     <Route path="/requests" element={<RequestHistories />} />
                                     <Route path="/location" element={<Location />} />
                                     <Route path="/" element={<Home />} />

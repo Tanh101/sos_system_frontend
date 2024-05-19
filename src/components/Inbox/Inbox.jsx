@@ -5,7 +5,6 @@ import { UserContext } from '../../Context/UserContext/UserContext';
 const Inbox = () => {
 
     const { setActiveItem, location } = useContext(UserContext);
-    // console.log(location);
     useEffect(() => {
         setActiveItem("messages");
     }, []);

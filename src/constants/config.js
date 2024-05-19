@@ -1,4 +1,7 @@
-const AppBaseUrl = import.meta.env.REACT_APP_API ?? 'http://localhost:8000/api';
+const AppBaseUrl = import.meta.env.VITE_REACT_APP_API ?? 'http://localhost:8000/api';
+
+const ServerURL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
+
 const SPACE_CHARACTER = '\u00A0';
 const defaultMapConfig = {
     gestureHandling: "greedy",
@@ -29,7 +32,16 @@ const googleMapComponentOptions = {
 };
 const mapLibraries = ["places"];
 
-const googleMapApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const googleMapApiKey =
+    import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+const socketMessage = {
+    CLIENT_REQUEST: "clientRequest",
+    RESPONSE_FROM_RESCUER: "responseFromRescuer",
+    RESCUER_JOIN: "rescuerJoin",
+    NEW_REQUEST: "newRequest",
+    RESCUER_RESPONSE: "rescuerResponse",
+}
 
 export {
     AppBaseUrl,
@@ -43,4 +55,6 @@ export {
     googleMapComponentOptions,
     mapLibraries,
     googleMapApiKey,
+    ServerURL,
+    socketMessage,
 }
