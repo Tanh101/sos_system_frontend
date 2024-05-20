@@ -13,7 +13,7 @@ const Help = () => {
     const { user, setActiveItem, receiveEmergencyRequest, sendResponseToClient } = useContext(UserContext);
     const [realTimeRequest, setRealTimeRequest] = useState([]);
     const [search, setSearch] = useState('');
-    const [requests, setRequests] = useState([]);
+    const [requests, setRequests] = useState({});
     const [loading, setLoading] = useState(true);
 
     const fetchRequests = async () => {
@@ -75,9 +75,9 @@ const Help = () => {
                         <p className='text-2xl'>No requests available</p>
                     </div>
                     }
-                    {requests && requests?.requests?.length && requests.requests.map((item, index) => (
-                        <Post item={item} key={index} />
-                    ))}
+                    {requests && 
+                        <Post requests={requests} />
+                    }
                 </div>
             </div>
         </div>

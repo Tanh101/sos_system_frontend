@@ -13,6 +13,7 @@ const Help = React.lazy(() => import("../../../components/Help/Help"));
 const Location = React.lazy(() => import("../../../components/Location/Location"));
 const Inbox = React.lazy(() => import("../../../components/Inbox/Inbox"));
 const Chatbot = React.lazy(() => import("../../../components/Chatbot/Chatbot"));
+const Profile = React.lazy(() => import("../../../components/Profile/Profile"));
 
 const UserNavigation = () => {
     return (
@@ -31,6 +32,7 @@ const UserNavigation = () => {
                                     <Route path="/location" element={<Location />} />
                                     <Route path="/" element={<Home />} />
                                     <Route path="/messages" element={<Inbox />} />
+                                    <Route path="/profile/*" element={<Profile />} />
                                 </Routes>
                             </Suspense>
                         </div>
