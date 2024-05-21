@@ -12,22 +12,21 @@ import RequestService from '../../../services/RequestService';
 import { Toastify } from '../../../toastify/Toastify';
 import PostDetail from '../PostDetail/PostDetail';
 
-const Post = ({ item }) => {
+const Post = ({ requests }) => {
     const navigate = useNavigate();
+    const { upvotePost, downvotePost } = RequestService();
+    const [upvoteClicked, setUpvoteClicked] = useState(null);
+    const [downvoteClicked, setDownvoteClicked] = useState(null);
 
-    const [upvoteClicked, setUpvoteClicked] = useState(false);
-    const [downvoteClicked, setDownvoteClicked] = useState(false);
-    const [voteCount, setVoteCount] = useState(item.voteCount);
     const [loading, setLoading] = useState(false);
 
-    const { upvotePost, downvotePost } = RequestService();
-
-    const handleUpvoteClick = async (event) => {
+    const handleUpvoteClick = async (event, item) => {
         event.stopPropagation();
         setLoading(true);
         try {
             // const newVoteCount = await upvotePost(item.id);
-            // setVoteCount(newVoteCount);
+            // item.voteCount = newVoteCount;
+
             setUpvoteClicked(!upvoteClicked);
             if (downvoteClicked) {
                 setDownvoteClicked(false);
@@ -39,12 +38,12 @@ const Post = ({ item }) => {
         }
     };
 
-    const handleDownvoteClick = async (event) => {
+    const handleDownvoteClick = async (event, item) => {
         event.stopPropagation();
         setLoading(true);
         try {
             // const newVoteCount = await downvotePost(item.id);
-            // setVoteCount(newVoteCount);
+            // item.voteCount = newVoteCount;
             setDownvoteClicked(!downvoteClicked);
             if (upvoteClicked) {
                 setUpvoteClicked(false);
@@ -63,11 +62,12 @@ const Post = ({ item }) => {
 
     return (
         <>
-            {item && (
+            {requests && requests?.requests?.length > 0 && requests?.requests?.map((item, index) => (
                 <Popup
+                    key={index}
                     trigger={
-                        <div className="flex flex-col bg-white hover:bg-slate-50 p-2 rounded-xl w-auto cursor-pointer">
-                            <div className={`flex flex-col mb-3 shadow-lg rounded-lg border m-4 p-4 bg-white ${item.isEmergency && 'border-[#F73334] border'}`}>
+                        <div className="flex flex-col bg-white hover:bg-slate-50 rounded-xl m-5 py-2  w-auto cursor-pointer">
+                            <div className={`flex flex-col mb-3 shadow-md rounded-lg border m-2 p-4 bg-white ${item.isEmergency ? 'border-[#F73334] border' : ''}`}>
                                 <div className="flex justify-between items-center">
                                     <div className="flex">
                                         <img width={58} src={item.user?.avatar || avatar} alt="" />
@@ -79,7 +79,6 @@ const Post = ({ item }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex"></div>
                                     <div className="flex">
                                         <button className="mx-4" onClick={handleMessageClick}>
                                             <FontAwesomeIcon icon={faMessage} color="red" size="lg" />
@@ -93,7 +92,7 @@ const Post = ({ item }) => {
                                     <div className="flex justify-start items-center">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faWarning} color="red" />
-                                            <p className="text-[#F73334] mx-2"></p>
+                                            <p className="text-[#F73334] mx-2">Emergency</p>
                                         </div>
                                     </div>
                                 )}
@@ -101,20 +100,18 @@ const Post = ({ item }) => {
                                     <p>{item.content}</p>
                                 </div>
                                 <div className="flex flex-wrap xl:min-w-[1000px] lg:min-w-[800px] md:min-w-[600px] min-h-10">
-                                    {item?.media &&
-                                        item?.media.length > 0 &&
-                                        item?.media.map((img, index) => (
-                                            <div className="w-full sm:w-1/3 md:w-1/3 lg:w-1/4 xl:w-1/3 p-2" key={index}>
-                                                <img className="m-2" width={500} src={img} alt="" />
-                                            </div>
-                                        ))}
+                                    {item?.media && item.media.length > 0 && item.media.map((img, index) => (
+                                        <div className="w-full sm:w-1/3 md:w-1/3 lg:w-1/4 xl:w-1/3 p-2" key={index}>
+                                            <img className="m-2" width={500} src={img} alt="" />
+                                        </div>
+                                    ))}
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <div className="flex rounded-2xl border-1 border-slate-300 border">
                                         <div className="flex justify-center items-center">
                                             <button
                                                 className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                                onClick={handleUpvoteClick}
+                                                onClick={(event) => handleUpvoteClick(event, item)}
                                                 disabled={loading}
                                             >
                                                 <FontAwesomeIcon
@@ -123,12 +120,12 @@ const Post = ({ item }) => {
                                                     className="hover:text-red-500"
                                                 />
                                             </button>
-                                            <p className="mx-2">{voteCount}</p>
+                                            <p className="mx-2">{item.voteCount}</p>
                                         </div>
                                         <div className="flex justify-center items-center">
                                             <button
                                                 className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                                onClick={handleDownvoteClick}
+                                                onClick={(event) => handleDownvoteClick(event, item)}
                                                 disabled={loading}
                                             >
                                                 <FontAwesomeIcon
@@ -157,13 +154,13 @@ const Post = ({ item }) => {
                         <PostDetail close={close} />
                     )}
                 </Popup>
-            )}
+            ))}
         </>
     );
 };
 
 Post.propTypes = {
-    item: PropTypes.object.isRequired,
+    requests: PropTypes.object.isRequired,
 };
 
 export default Post;

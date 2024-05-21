@@ -1,4 +1,5 @@
 const AppBaseUrl = import.meta.env.VITE_REACT_APP_API ?? 'http://localhost:8000/api';
+const ChatbotUrl = import.meta.env.VITE_REACT_CHATBOT_API ?? 'http://localhost:8001/api';
 
 const ServerURL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 
@@ -57,4 +58,5 @@ export {
     googleMapApiKey,
     ServerURL,
     socketMessage,
+    ChatbotUrl
 }
