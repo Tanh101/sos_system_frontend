@@ -7,7 +7,17 @@
         "Loại hỗ trợ": "Support type",
         "Xác nhận": "Confirm",
         "Tôi cần hỗ trợ khẩn cấp": "I need urgent rescue",
-        "YÊU CẦU KHẨN CẤP" : "EMERGENCY REQUEST",
-        "bình luận":"comments"
+        "YÊU CẦU KHẨN CẤP": "EMERGENCY REQUEST",
+        "bình luận": "comments",
+        "Giới tính": "Gender",
+        "Ngày sinh": "Date of Birth",
+        "Tên": "Name",
+        "Địa chỉ": "Address",
+        "Số điện thoại": "Phone number",
+        "Sửa": "Edit",
+        "Nam": "Male",
+        "Nữ": "Female",
+        "Lưu": "Save",
+        "Hủy": "Cancel"
     }
 }

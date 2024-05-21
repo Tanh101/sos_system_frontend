@@ -4,9 +4,11 @@ import { useState } from 'react';
 
 import chatbot from '../../assets/imgs/robot.png';
 import avatar from '../../assets/imgs/avatar.png';
+import ChatService from '../../services/ChatService.js';
 
 const Chatbot = () => {
     const [showChatbot, setShowChatbot] = useState(false);
+    const { getMessages } = ChatService();
 
     const [messages, setMessages] = useState([{
         sender: 'ai',
@@ -17,34 +19,42 @@ const Chatbot = () => {
     const [isTyping, setIsTyping] = useState(false);
 
     const handleSend = () => {
+        const fetchChatbotResponse = async () => {
+            try {
+                const response = await getMessages(input);
+                setMessages((prevMessages) => [...prevMessages, { sender: 'ai', text: response }]);
+                setIsTyping(false);
+            } catch (error) {
+                console.error('Failed to fetch chatbot response:', error);
+            }
+        };
+
         if (input.trim()) {
             setMessages([...messages, { sender: 'user', text: input }]);
             setInput('');
             setIsTyping(true);
 
-            setTimeout(() => {
-                setMessages((prevMessages) => [...prevMessages, { sender: 'ai', text: 'This is a response from AI.' }]);
-                setIsTyping(false);
-            }, 1000);
+            fetchChatbotResponse();
         }
     };
 
+
     return (
-        <div className='fixed z-50 bottom-0 right-0 m-10'>
+        <div className='fixed z-50 bottom-0 right-0 m-10 font-roboto'>
             <div className="flex rounded-full bg-white border-2 shadow-lg hover:bg-slate-200 hover:">
                 <button className="p-2" onClick={() => setShowChatbot(!showChatbot)}>
                     <img width={60} src={chatbot} alt="Chatbot" />
                 </button>
             </div>
             {showChatbot && (
-                <div className="fixed bottom-10 right-10 w-80 h-[560px] bg-white border shadow-lg flex flex-col font-poppins text-sm">
+                <div className="fixed bottom-10 right-10 w-80 h-[560px] bg-white border shadow-lg flex flex-col font-roboto text-sm">
                     <div className="flex justify-between items-center bg-[#F73334] text-white p-4 rounded-t-lg">
                         <h1 className='text-xl'>Req Support</h1>
                         <button className='text-white hover:bg-white hover:text-red-600 rounded-2xl px-2' onClick={() => setShowChatbot(false)}>
                             <FontAwesomeIcon icon={faClose} />
                         </button>
                     </div>
-                    <div className="flex-1 overflow-y-auto my-2">
+                    <div className="flex-1 overflow-y-auto my-2 ">
                         {messages.map((message, index) => (
                             <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-2`}>
                                 <div className={`flex items-center w-52 px-3 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
