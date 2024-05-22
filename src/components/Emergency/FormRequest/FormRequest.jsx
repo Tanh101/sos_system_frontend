@@ -14,10 +14,11 @@ import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 import RequestService from "../../../services/RequestService";
 import Loading from "../../Loading/Loading";
 import { UserContext } from "../../../Context/UserContext/UserContext";
+import FileUpload from "../../FileUpload/FileUpload";
 
 const schema = emergencyRequestSchema;
 
-const FormRequest = () => {
+const FormRequest = ({ isEmergency }) => {
     const { t } = useTranslation();
     const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
 
@@ -101,6 +102,9 @@ const FormRequest = () => {
                                     {errors.requestType && <div className="flex">
                                         <p className="text-red">{errors.requestType.message}</p>
                                     </div>}
+                                </div>
+                                <div className="flex flex-1 lg:flex-row flex-col my-5 flex-wrap">
+                                    <FileUpload />
                                 </div>
                                 <div className="flex flex-1 lg:flex-row flex-col my-5 flex-wrap">
                                     <div className="flex w-44 flex-wrap">
