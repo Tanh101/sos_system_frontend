@@ -75,7 +75,7 @@ const Profile = () => {
                             Rejected
                         </button>
                     </div>
-                    <div className="flex flex-col w-full h-screen overflow-y-auto max-w-[1000px]">
+                    <div className="flex flex-col w-full h-screen overflow-y-auto">
                         <Routes>
                             <Route path="" element={<Overview />} />
                             <Route path="post" element={<Post requests={requests} />} />
@@ -83,9 +83,6 @@ const Profile = () => {
                             <Route path="rejected" element={<Post requests={requests} />} />
                         </Routes>
                     </div>
-                </div>
-                <div className="flex mx-10 w-96 h-96 bg-slate-50 rounded-lg shadow-sm p-10 m-10">
-                    Additional content here
                 </div>
             </div>
         </div>

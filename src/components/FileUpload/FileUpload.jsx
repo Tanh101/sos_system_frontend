@@ -11,14 +11,12 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-
-const FileUpload = () => {
-    const { upload } = UploadImgsService()
+const FileUpload = ({ avatarResponse, setAvatarResponses }) => {
+    const { upload } = UploadImgsService();
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
-    const [avatarResponse, setAvatarResponse] = useState('');
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -31,13 +29,15 @@ const FileUpload = () => {
 
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-    const handleAvatarChange = async ({ file }) => {
+    const handleAvatarChange = async ({ file, onSuccess, onError }) => {
         if (file) {
             try {
-                const response = await upload(fileList);
-                console.log(response);
+                const response = await upload(file);
+                setAvatarResponses(prev => [...prev, response.data[0].url]);
+                onSuccess(response, file); // Call the onSuccess callback to mark the upload as successful
             } catch (error) {
                 console.error('Failed to upload avatar', error);
+                onError(error); // Call the onError callback to mark the upload as failed
             }
         }
     };
@@ -57,6 +57,7 @@ const FileUpload = () => {
                 onPreview={handlePreview}
                 onChange={handleChange}
                 customRequest={handleAvatarChange}
+                multiple // Allow multiple file uploads
             >
                 {fileList.length >= 5 ? null : uploadButton}
             </Upload>
@@ -70,11 +71,6 @@ const FileUpload = () => {
                     }}
                     src={previewImage}
                 />
-            )}
-            {avatarResponse && (
-                <div>
-                    <img src={avatarResponse} alt="avatar" style={{ width: '100px', height: '100px' }} />
-                </div>
             )}
         </>
     );

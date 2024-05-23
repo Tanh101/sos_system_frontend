@@ -11,9 +11,13 @@ import avatar from '../../../assets/imgs/avatar.png';
 import RequestService from '../../../services/RequestService';
 import { Toastify } from '../../../toastify/Toastify';
 import PostDetail from '../PostDetail/PostDetail';
+import { useTranslation } from 'react-i18next';
+import { Image } from 'antd';
 
 const Post = ({ requests }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
+
     const { upvotePost, downvotePost } = RequestService();
     const [upvoteClicked, setUpvoteClicked] = useState(null);
     const [downvoteClicked, setDownvoteClicked] = useState(null);
@@ -88,23 +92,25 @@ const Post = ({ requests }) => {
                                         </button>
                                     </div>
                                 </div>
-                                {item.isEmergency && (
+                                {item.isEmergency ? (
                                     <div className="flex justify-start items-center">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faWarning} color="red" />
-                                            <p className="text-[#F73334] mx-2">Emergency</p>
+                                            <p className="text-[#F73334] mx-2">{t("Khẩn cấp")}</p>
                                         </div>
                                     </div>
-                                )}
+                                ) : (null)}
                                 <div className="flex my-2">
                                     <p>{item.content}</p>
                                 </div>
-                                <div className="flex flex-wrap xl:min-w-[1000px] lg:min-w-[800px] md:min-w-[600px] min-h-10">
-                                    {item?.media && item.media.length > 0 && item.media.map((img, index) => (
-                                        <div className="w-full sm:w-1/3 md:w-1/3 lg:w-1/4 xl:w-1/3 p-2" key={index}>
-                                            <img className="m-2" width={500} src={img} alt="" />
+                                <div className="flex flex-col w-full justify-center items-start ml-2">
+                                    {item?.media?.length > 0 && (
+                                        <div className="grid grid-cols-3 gap-4">
+                                            {item?.media.map((media, index) => (
+                                                <img key={index} src={media.url} alt="Post" className="w-full h-auto rounded-lg" />
+                                            ))}
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <div className="flex rounded-2xl border-1 border-slate-300 border">
@@ -140,7 +146,7 @@ const Post = ({ requests }) => {
                                         <div className="flex justify-center items-center rounded-lg border-1 border-slate-300">
                                             <FontAwesomeIcon className='cursor-pointer px-2 py-2 hover:bg-slate-100 rounded-2xl'
                                                 icon={faComment} color="red" size='lg' />
-                                            <p className='mx-2'>12 comments</p>
+                                            <p className='mx-2'>12 {t('bình luận')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -148,10 +154,11 @@ const Post = ({ requests }) => {
                         </div>
                     }
                     modal
+                    nested
                     contentStyle={{ borderRadius: '10px' }}
                 >
                     {close => (
-                        <PostDetail close={close} />
+                        <PostDetail post={item} close={close} />
                     )}
                 </Popup>
             ))}
