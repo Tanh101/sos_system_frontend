@@ -20,15 +20,40 @@ const RequestService = () => {
         }
     };
 
-    const createEmergencyRequest = async (data) => {
+    const processRequestData = (data) => {
         try {
+            console.log(data);
+            const data = {
+                requestTypeId: data.requestType,
+                content: data.content,
+                latitude: data.lat,
+                longitude: data.lng,
+                address: data.address,
+                isEmergency: data.isEmergency ? 1 : 0,
+                media: data.avatarResponses.map((item) => {
+                    return {
+                        item,
+                    };
+                }),
+            }
+            return data;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const createRequest = async (data) => {
+        try {
+            const media = data.avatarResponses.map(item => item);
+
             const response = await api.post("/requests", {
                 requestTypeId: data.requestType,
                 content: data.content,
                 latitude: data.lat,
                 longitude: data.lng,
                 address: data.address,
-                isEmergency: 1,
+                isEmergency: data.isEmergency ? 1 : 0,
+                media: media
             });
 
             if (response.status === 200) {
@@ -108,12 +133,25 @@ const RequestService = () => {
         }
     };
 
+    const getRequestDetail = async (id) => {
+        try {
+            const response = await api.get(`/requests/${id}`);
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    };
+
     return {
         getRequestType,
-        createEmergencyRequest,
+        createRequest,
         getRequests,
         upvotePost,
         downvotePost,
+        getRequestDetail,
     };
 };
 

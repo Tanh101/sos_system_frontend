@@ -33,7 +33,7 @@ const Ring = () => {
                     nested
                     contentStyle={{ borderRadius: '10px' }}
                 >
-                    <FormRequest />
+                    <FormRequest isEmergency={true} />
                 </Popup>
                 <div className="flex justify-center ml-3 mt-3">
                     <p className="font-semibold text-2xl">Emergency Request</p>

@@ -14,20 +14,22 @@ import LocationSearchInput from "../LocationSearchInput/LocationSearchInput";
 import RequestService from "../../../services/RequestService";
 import Loading from "../../Loading/Loading";
 import { UserContext } from "../../../Context/UserContext/UserContext";
+import FileUpload from "../../FileUpload/FileUpload";
 
 const schema = emergencyRequestSchema;
 
-const FormRequest = () => {
+const FormRequest = ({ isEmergency }) => {
     const { t } = useTranslation();
     const { sendEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
 
     const { requestLocation } = useContext(UserMarkerPlaceContext);
 
-    const { getRequestType, createEmergencyRequest } = RequestService();
+    const { getRequestType, createRequest } = RequestService();
 
     const [response, setResponse] = useState(null);
 
     const [requestType, setRequestType] = useState([]);
+    const [avatarResponses, setAvatarResponses] = useState([]);
 
     const { handleSubmit,
         register,
@@ -43,7 +45,7 @@ const FormRequest = () => {
     const formSubmit = async (data) => {
         const { content, requestType } = data;
         handleProcessSocket({ content, requestType, ...requestLocation });
-        await createEmergencyRequest({ content, requestType, ...requestLocation })
+        await createRequest({ content, isEmergency, avatarResponses, requestType, ...requestLocation })
     }
 
     useEffect(() => {
@@ -67,7 +69,7 @@ const FormRequest = () => {
             {requestType && requestType?.length > 0 ? (
                 <div className='bg-white items-center justify-center rounded-lg shadow-lg px-6 pb-6 min-w-96 w-full'>
                     <form className="flex flex-col rounded-xl" onSubmit={handleSubmit(formSubmit)}>
-                        <div className="flex lg:flex-row flex-col justify-start lg:items-center items-start my-5">
+                        <div className="flex lg:flex-row flex-col justify-start lg:items-center items-start mb-2">
                             <label className="mr-2 min-w-14 font-semibold" htmlFor="address">{t("Nhập địa chỉ của bạn")}</label>
                             <div className='flex border rounded-xl px-2 mx-2 justify-between items-center shadow-md' >
                                 <FontAwesomeIcon icon={faLocationDot} color="red" />
@@ -80,10 +82,9 @@ const FormRequest = () => {
                             </div>
                         </div>
                         <div className="flex flex-col mt-2">
-
                             <RequestMap mapContainerStyle={EmergencyMapContainerStyle} />
                             <div className="flex flex-col justify-between">
-                                <div className="flex my-5 flex-wrap">
+                                <div className="flex my-2 flex-wrap">
                                     <div className="flex w-44 flex-wrap">
                                         <label className="mr-5 font-semibold" htmlFor="about">{t("Loại hỗ trợ")}</label>
                                     </div>
@@ -96,14 +97,19 @@ const FormRequest = () => {
                                         {requestType.map((type) => (
                                             <option key={type.id} value={type.id}>{type.name}</option>
                                         ))}
-
                                     </select>
                                     {errors.requestType && <div className="flex">
                                         <p className="text-red">{errors.requestType.message}</p>
                                     </div>}
                                 </div>
-                                <div className="flex flex-1 lg:flex-row flex-col my-5 flex-wrap">
-                                    <div className="flex w-44 flex-wrap">
+                                {!isEmergency && (
+                                    <div className="flex flex-1 lg:flex-row flex-col flex-wrap">
+                                        <label className="mr-5 font-semibold" htmlFor="about">{t("Hình ảnh")}</label>
+                                        <FileUpload avatarResponses={avatarResponses} setAvatarResponses={setAvatarResponses} />
+                                    </div>
+                                )}
+                                <div className="flex flex-1 lg:flex-row flex-col my-2 flex-wrap">
+                                    <div className="flex w-60 flex-wrap">
                                         <label className="mr-5 font-semibold" htmlFor="about">{t("Nội dung yêu cầu hỗ trợ")}</label>
                                     </div>
 

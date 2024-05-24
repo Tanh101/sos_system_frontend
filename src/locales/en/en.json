@@ -18,6 +18,19 @@
         "Nam": "Male",
         "Nữ": "Female",
         "Lưu": "Save",
-        "Hủy": "Cancel"
+        "Hủy": "Cancel",
+        "Tạo yêu cầu": "Create request",
+        "Không có yêu cầu nào": "No requests available",
+        "Thông tin liên hệ": "Contact information",
+        "Tìm kiếm yêu cầu...": " Search request...",
+        "Hình ảnh": "Image",
+        "Gửi": "Send",
+        "REQ hỗ trợ": "REQ Support",
+        "Xin chào, Tôi có thể giúp gì cho bạn?": "Hello, how can I help you?",
+        "Bình luận": "comments",
+        "Khẩn cấp": "Emergency",
+        "Bộ lọc": "Filter",
+        "Loại yêu cầu: ": "Request type: ",
+        "Tất cả": "All"
     }
 }

@@ -1,18 +1,21 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import chatbot from '../../assets/imgs/robot.png';
 import avatar from '../../assets/imgs/avatar.png';
 import ChatService from '../../services/ChatService.js';
+import { useTranslation } from 'react-i18next';
 
 const Chatbot = () => {
+    const { t } = useTranslation();
+
     const [showChatbot, setShowChatbot] = useState(false);
     const { getMessages } = ChatService();
 
     const [messages, setMessages] = useState([{
         sender: 'ai',
-        text: 'Hello! How can I help you?',
+        text: t("Xin chào, Tôi có thể giúp gì cho bạn?"),
     }]);
 
     const [input, setInput] = useState('');
@@ -49,7 +52,7 @@ const Chatbot = () => {
             {showChatbot && (
                 <div className="fixed bottom-10 right-10 w-80 h-[560px] bg-white border shadow-lg flex flex-col font-roboto text-sm">
                     <div className="flex justify-between items-center bg-[#F73334] text-white p-4 rounded-t-lg">
-                        <h1 className='text-xl'>Req Support</h1>
+                        <h1 className='text-xl'>{t("REQ hỗ trợ")}</h1>
                         <button className='text-white hover:bg-white hover:text-red-600 rounded-2xl px-2' onClick={() => setShowChatbot(false)}>
                             <FontAwesomeIcon icon={faClose} />
                         </button>
@@ -92,7 +95,7 @@ const Chatbot = () => {
                             className="flex-1 p-2 border rounded-l-lg outline-none resize-none overflow-y-auto"
                             style={{ maxHeight: '100px' }}
                         />
-                        <button type='submit' onClick={handleSend} className="p-2 bg-[#F73334] text-white rounded-r-lg">Send</button>
+                        <button type='submit' onClick={handleSend} className="p-2 bg-[#F73334] text-white rounded-r-lg">{t("Gửi")}</button>
                     </div>
                 </div>
             )}

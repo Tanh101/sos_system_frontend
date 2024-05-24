@@ -59,7 +59,7 @@ const MyMapComponent = ({ mapContainerStyle }) => {
         ) : (
             <Loading />
         )
-    );
+    )
 }
 
 export default MyMapComponent;

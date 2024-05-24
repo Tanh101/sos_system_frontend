@@ -4,10 +4,11 @@ import PropTypes from "prop-types";
 
 import {
     rescuerMarkerIconURL,
-    userMarkerIconURL
+    userMarkerIconURL,
+    requestMarkerIconURL
 } from "../../constants/config";
 
-const PlaceInfo = ({ userPlace, rescuerPlaces }) => {
+const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace }) => {
 
     const [selected, setSelected] = useState(null);
 
@@ -32,20 +33,36 @@ const PlaceInfo = ({ userPlace, rescuerPlaces }) => {
                 />
             ))}
 
-            <Marker
-                position={{
-                    lat: userPlace.location.lat,
-                    lng: userPlace.location.lng
-                }}
-                onClick={() => {
-                    setSelected(userPlace);
-                }}
-                icon={{
-                    url: userMarkerIconURL,
-                    origin: new window.google.maps.Point(0, 0),
-                    scaledSize: new window.google.maps.Size(40, 40)
-                }}
-            />
+            {userPlace && (
+                <Marker
+                    position={{
+                        lat: userPlace.location.lat,
+                        lng: userPlace.location.lng
+                    }}
+                    onClick={() => {
+                        setSelected(userPlace);
+                    }}
+                    icon={{
+                        url: userMarkerIconURL,
+                        origin: new window.google.maps.Point(0, 0),
+                        scaledSize: new window.google.maps.Size(40, 40)
+                    }}
+                />
+            )}
+
+            {requestPlace && (
+                <Marker
+                    position={{
+                        lat: requestPlace.lat,
+                        lng: requestPlace.lng
+                    }}
+                    icon={{
+                        url: requestMarkerIconURL,
+                        origin: new window.google.maps.Point(0, 0),
+                        scaledSize: new window.google.maps.Size(40, 40)
+                    }}
+                />
+            )}
 
             {selected ? (
                 <InfoWindow
@@ -66,6 +83,6 @@ const PlaceInfo = ({ userPlace, rescuerPlaces }) => {
 export default PlaceInfo;
 
 PlaceInfo.propTypes = {
-    userPlace: PropTypes.object.isRequired,
-    rescuerPlaces: PropTypes.array.isRequired,
+    userPlace: PropTypes.object,
+    rescuerPlaces: PropTypes.array,
 };
