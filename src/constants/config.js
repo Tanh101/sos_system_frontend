@@ -1,7 +1,10 @@
-const AppBaseUrl = import.meta.env.VITE_REACT_APP_API ?? 'http://localhost:8000/api';
-const ChatbotUrl = import.meta.env.VITE_REACT_CHATBOT_API ?? 'http://localhost:8001/api';
+const AppBaseUrl =
+    import.meta.env.VITE_REACT_APP_API ?? 'http://localhost:8000/api';
+const ChatbotUrl =
+    import.meta.env.VITE_REACT_CHATBOT_API ?? 'http://localhost:8001/api';
 
-const ServerURL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
+const ServerURL =
+    import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 
 const SPACE_CHARACTER = '\u00A0';
 const defaultMapConfig = {
@@ -18,6 +21,7 @@ const defaultMapContainerStyle = {
 }
 const rescuerMarkerIconURL = "https://sossystem.s3.amazonaws.com/hopitalmarker.png";
 const userMarkerIconURL = "https://sossystem.s3.amazonaws.com/image.png";
+const requestMarkerIconURL = "https://sossystem.s3.us-east-1.amazonaws.com/1716474017690";
 const EmergencyMapContainerStyle = {
     height: "40vh",
     width: "100%"
@@ -58,5 +62,6 @@ export {
     googleMapApiKey,
     ServerURL,
     socketMessage,
-    ChatbotUrl
+    ChatbotUrl,
+    requestMarkerIconURL
 }

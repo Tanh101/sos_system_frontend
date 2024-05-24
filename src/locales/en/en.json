@@ -28,6 +28,9 @@
         "REQ hỗ trợ": "REQ Support",
         "Xin chào, Tôi có thể giúp gì cho bạn?": "Hello, how can I help you?",
         "Bình luận": "comments",
-        "Khẩn cấp": "Emergency"
+        "Khẩn cấp": "Emergency",
+        "Bộ lọc": "Filter",
+        "Loại yêu cầu: ": "Request type: ",
+        "Tất cả": "All"
     }
 }

@@ -58,6 +58,7 @@ const Navbar = () => {
             });
         } else if (user && user.role === 'user') {
             receiveResponseFromRescuer((data) => {
+                console.log('Response from rescuer:', data);
                 setCount(prevCount => prevCount + 1);
             });
         }
