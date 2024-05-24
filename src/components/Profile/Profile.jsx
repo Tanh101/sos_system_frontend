@@ -1,15 +1,19 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import avatar from "../../assets/imgs/avatar.png";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Overview from "./Overview/Overview";
 import Post from "../Help/Post/Post";
 import RequestService from "../../services/RequestService";
+import { UserContext } from "../../Context/UserContext/UserContext";
+import { t } from "i18next";
 
 const Profile = () => {
     const [activeMenu, setActiveMenu] = useState('');
     const navigate = useNavigate();
+
+    const { user } = useContext(UserContext);
 
     const handleNavigate = (menu) => {
         setActiveMenu(menu);
@@ -54,25 +58,25 @@ const Profile = () => {
                             className={`px-2 py-2 mx-5 rounded-2xl border-white hover:bg-slate-200 ${activeMenu === '' ? 'bg-gray-200' : ''}`}
                             onClick={() => handleNavigate("")}
                         >
-                            Profile
+                            {t("Thông tin cá nhân")}
                         </button>
                         <button
                             className={`px-2 py-2 mx-5 rounded-2xl border-white hover:bg-slate-200 ${activeMenu === 'post' ? 'bg-gray-200' : ''}`}
                             onClick={() => handleNavigate("post")}
                         >
-                            Post
+                            {t("Yêu cầu của tôi")}
                         </button>
                         <button
                             className={`px-2 py-2 mx-5 rounded-2xl border-white hover:bg-slate-200 ${activeMenu === 'supported' ? 'bg-gray-200' : ''}`}
                             onClick={() => handleNavigate("supported")}
                         >
-                            Supported
+                            {user.role === 'user' ? t('Đã được hỗ trợ') : t("Đã hỗ trợ")}
                         </button>
                         <button
                             className={`px-2 py-2 mx-5 rounded-2xl border-white hover:bg-slate-200 ${activeMenu === 'rejected' ? 'bg-gray-200' : ''}`}
                             onClick={() => handleNavigate("rejected")}
                         >
-                            Rejected
+                            {user.role === 'user' ? t("Đã bị từ chối") : t("Đã từ chối")}
                         </button>
                     </div>
                     <div className="flex flex-col w-full h-screen overflow-y-auto">

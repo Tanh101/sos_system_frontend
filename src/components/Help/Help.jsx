@@ -18,7 +18,7 @@ const Help = () => {
 
     const { getRequests, getRequestType } = RequestService();
 
-    const { user, setActiveItem, receiveEmergencyRequest, sendResponseToClient } = useContext(UserContext);
+    const { user, setActiveItem, receiveEmergencyRequest } = useContext(UserContext);
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
@@ -29,12 +29,6 @@ const Help = () => {
     const [requests, setRequests] = useState({});
     const [loading, setLoading] = useState(true);
     const [requestType, setRequestType] = useState([]);
-
-    const handleResponse = (clientId) => {
-        const responseData = { clientId, message: 'Rescue on the way!' };
-        console.log('Response to client:', responseData);
-        sendResponseToClient(responseData);
-    };
 
     useEffect(() => {
         const fetchRequestType = async () => {
@@ -70,17 +64,15 @@ const Help = () => {
     useEffect(() => {
         if (user && user.role === 'rescuer') {
             receiveEmergencyRequest((data) => {
-                console.log('New request:', data);
                 setRealTimeRequest([...realTimeRequest, data]);
-                fetchRequests();
+                fetchRequests();  // Thêm lời gọi fetchRequests để cập nhật lại danh sách requests
             });
         }
-    }, [user]);
+    }, [user, realTimeRequest]);
 
     if (loading) {
         return <Loading />
     }
-
     return (
         <UserMarkerPlaceProvider>
             <div className="flex flex-col flex-1 bg-white overflow-y-auto">
@@ -126,7 +118,7 @@ const Help = () => {
                         </div>
                         }
                         {requests &&
-                            <Post requests={requests} />
+                            <Post requests={requests} realTimeRequest={realTimeRequest} />
                         }
                     </div>
                 </div>

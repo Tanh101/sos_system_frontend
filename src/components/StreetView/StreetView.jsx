@@ -38,9 +38,9 @@ const StreetView = ({ requestPlace }) => {
 
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
-    console.log(requestPlace);
+
     return (
-        requestPlace?.lat && requestPlace?.lng ? (
+        requestPlace?.location?.lat && requestPlace?.location?.lng ? (
 
             <div className="flex flex-col w-full">
                 <div className="flex flex-1">
@@ -49,8 +49,8 @@ const StreetView = ({ requestPlace }) => {
                         mapContainerStyle={EmergencyMapContainerStyle}
                         zoom={15}
                         center={{
-                            lat: parseFloat(requestPlace.lat),
-                            lng: parseFloat(requestPlace.lng)
+                            lat: requestPlace?.location?.lat,
+                            lng: requestPlace?.location?.lng,
                         }}
                         options={googleMapComponentOptions}
                         onLoad={onMapLoad}
