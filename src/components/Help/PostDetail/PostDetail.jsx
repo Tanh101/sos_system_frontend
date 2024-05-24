@@ -59,7 +59,6 @@ const PostDetail = ({ close, post }) => {
         }
     };
 
-    console.log(post);
 
     // useEffect(() => {
     //     const fetchPostDetail = async () => {

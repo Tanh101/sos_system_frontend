@@ -15,18 +15,17 @@ import { useTranslation } from 'react-i18next';
 import StreetView from '../../StreetView/StreetView';
 import { UserContext } from '../../../Context/UserContext/UserContext';
 
-const Post = ({ requests }) => {
+const Post = ({ requests, realTimeRequest }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-
+    console.log(realTimeRequest);
     const { upvotePost, downvotePost } = RequestService();
     const { user, sendResponseToClient } = useContext(UserContext);
 
     const [upvoteClicked, setUpvoteClicked] = useState(null);
     const [downvoteClicked, setDownvoteClicked] = useState(null);
     const [isOpenStreetView, setIsOpenStreetView] = useState(false);
-    const [requestPalce, setRequestPlace] = useState({});
-
+    const [requestPlace, setRequestPlace] = useState({});
     const [loading, setLoading] = useState(false);
 
     const handleUpvoteClick = async (event, item) => {
@@ -72,14 +71,17 @@ const Post = ({ requests }) => {
     const handleStreetViewClick = (event, item) => {
         event.stopPropagation();
         setRequestPlace({
-            lat: parseFloat(item.latitude),
-            lng: parseFloat(item.longitude),
-            address: item.address
+            location: {
+                lat: parseFloat(item.latitude),
+                lng: parseFloat(item.longitude),
+            },
+            info: item.address
         });
         setIsOpenStreetView(true);
     }
 
-    const handleResponse = (event, clientId) => {
+    const handleResponse = (event) => {
+        const clientId = realTimeRequest[0]?.clientId;
         event.stopPropagation();
         const responseData = { clientId, message: 'Rescue on the way!' };
         console.log('Response to client:', responseData);
@@ -92,7 +94,7 @@ const Post = ({ requests }) => {
                 <Popup
                     key={index}
                     trigger={
-                        <div className="flex flex-col bg-white hover:bg-slate-50 rounded-xl m-5 py-2  w-auto cursor-pointer">
+                        <div className="flex flex-col bg-white hover:bg-slate-50 rounded-xl m-5 py-2 w-auto cursor-pointer">
                             <div className={`flex flex-col mb-3 shadow-md rounded-lg border m-2 p-4 bg-white ${item.isEmergency ? 'border-[#F73334] border' : ''}`}>
                                 <div className="flex justify-between items-center">
                                     <div className="flex">
@@ -100,7 +102,7 @@ const Post = ({ requests }) => {
                                         <div className="flex flex-col">
                                             <p>{item.user?.name}</p>
                                             <div className="flex text-slate-400">
-                                                <p>10km</p>
+                                                <p className='mr-2'>10km</p>
                                                 <p>18:30</p>
                                             </div>
                                         </div>
@@ -174,9 +176,9 @@ const Post = ({ requests }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    {user?.role === 'rescuer' && (
+                                    {user?.role === 'rescuer' && item.status === 0 && (
                                         <div className="flex justify-center items-center">
-                                            <button onClick={handleResponse}>
+                                            <button onClick={(event) => handleResponse(event)}>
                                                 <FontAwesomeIcon className='hover:text-blue-600 px-2 py-2 rounded-full hover:bg-blue-300 mx-2' icon={faCheck} color="red" size="xl" />
                                             </button>
                                             <button>
@@ -216,7 +218,7 @@ const Post = ({ requests }) => {
                             <div className="flex">
 
                             </div>
-                            <StreetView requestPlace={requestPalce} />
+                            <StreetView requestPlace={requestPlace} />
                         </div>
                     )}
                 </Popup>

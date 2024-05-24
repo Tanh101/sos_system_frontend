@@ -9,9 +9,7 @@ import {
 } from "../../constants/config";
 
 const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace }) => {
-
     const [selected, setSelected] = useState(null);
-
     return (
         <>
             {rescuerPlaces.map((marker) => (
@@ -33,6 +31,23 @@ const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace }) => {
                 />
             ))}
 
+            {requestPlace && (
+                <Marker
+                    position={{
+                        lat: requestPlace.location.lat,
+                        lng: requestPlace.location.lng
+                    }}
+                    onClick={() => {
+                        setSelected(requestPlace);
+                    }}
+                    icon={{
+                        url: requestMarkerIconURL,
+                        origin: new window.google.maps.Point(0, 0),
+                        scaledSize: new window.google.maps.Size(40, 40)
+                    }}
+                />
+            )}
+
             {userPlace && (
                 <Marker
                     position={{
@@ -50,19 +65,7 @@ const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace }) => {
                 />
             )}
 
-            {requestPlace && (
-                <Marker
-                    position={{
-                        lat: requestPlace.lat,
-                        lng: requestPlace.lng
-                    }}
-                    icon={{
-                        url: requestMarkerIconURL,
-                        origin: new window.google.maps.Point(0, 0),
-                        scaledSize: new window.google.maps.Size(40, 40)
-                    }}
-                />
-            )}
+
 
             {selected ? (
                 <InfoWindow
@@ -85,4 +88,5 @@ export default PlaceInfo;
 PlaceInfo.propTypes = {
     userPlace: PropTypes.object,
     rescuerPlaces: PropTypes.array,
+    requestPlace: PropTypes.object,
 };

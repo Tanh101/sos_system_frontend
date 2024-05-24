@@ -31,6 +31,12 @@
         "Khẩn cấp": "Emergency",
         "Bộ lọc": "Filter",
         "Loại yêu cầu: ": "Request type: ",
-        "Tất cả": "All"
+        "Tất cả": "All",
+        "Đã được hỗ trợ": "Supported",
+        "Đã hỗ trợ": "Accepted",
+        "Đã bị từ chối": "Rejected",
+        "Đã từ chối": "Refused",
+        "Thông tin cá nhân": "Profile",
+        "Yêu cầu của tôi" : "My Requests"
     }
 }
