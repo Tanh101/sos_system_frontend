@@ -8,7 +8,6 @@ import { LocaleProvider } from "../../../Context/LocaleContext/LocaleContext";
 const Navbar = React.lazy(() => import("../../../components/Navbar/Navbar"));
 const Sidebar = React.lazy(() => import("../../../components/User/Sidebar/Sidebar"));
 const Home = React.lazy(() => import("../../../components/Home/Home"));
-const RequestHistories = React.lazy(() => import("../../../components/RequestHistories/RequestHistories"));
 const Help = React.lazy(() => import("../../../components/Help/Help"));
 const Location = React.lazy(() => import("../../../components/Location/Location"));
 const Inbox = React.lazy(() => import("../../../components/Inbox/Inbox"));
@@ -28,7 +27,6 @@ const UserNavigation = () => {
                             <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
                                 <Routes>
                                     <Route path="/help/*" element={<Help />} />
-                                    <Route path="/requests" element={<RequestHistories />} />
                                     <Route path="/location" element={<Location />} />
                                     <Route path="/" element={<Home />} />
                                     <Route path="/messages" element={<Inbox />} />

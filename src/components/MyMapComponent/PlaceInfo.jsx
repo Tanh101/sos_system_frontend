@@ -5,10 +5,11 @@ import PropTypes from "prop-types";
 import {
     rescuerMarkerIconURL,
     userMarkerIconURL,
-    requestMarkerIconURL
+    requestMarkerIconURL,
+    searchMarkerIconURL
 } from "../../constants/config";
 
-const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace }) => {
+const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace, searchLocation }) => {
     const [selected, setSelected] = useState(null);
     return (
         <>
@@ -65,6 +66,23 @@ const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace }) => {
                 />
             )}
 
+            {searchLocation.location.lat && (
+                <Marker
+                    position={{
+                        lat: searchLocation.location.lat,
+                        lng: searchLocation.location.lng
+                    }}
+                    onClick={() => {
+                        setSelected(searchLocation);
+                    }}
+                    icon={{
+                        url: searchMarkerIconURL,
+                        origin: new window.google.maps.Point(0, 0),
+                        scaledSize: new window.google.maps.Size(40, 40)
+                    }}
+                />
+            )}
+
 
 
             {selected ? (
@@ -89,4 +107,5 @@ PlaceInfo.propTypes = {
     userPlace: PropTypes.object,
     rescuerPlaces: PropTypes.array,
     requestPlace: PropTypes.object,
+    searchLocation: PropTypes.object
 };

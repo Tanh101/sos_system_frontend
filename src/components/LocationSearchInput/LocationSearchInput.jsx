@@ -10,8 +10,7 @@ import { Toastify } from '../../toastify/Toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons/faLocationDot';
 
-const LocationSearchInput = () => {
-
+const LocationSearchInput = ({ searchLocation, setSearchLocation }) => {
     const [address, setAddress] = useState('');
 
     const { isLoaded } = useJsApiLoader({
@@ -31,13 +30,24 @@ const LocationSearchInput = () => {
         geocodeByAddress(address)
             .then(results => getLatLng(results[0]))
             .then((latLng) => {
-                console.log('Success', latLng);
-
+                try {
+                    setSearchLocation({
+                        location: {
+                            lat: latLng.lat,
+                            lng: latLng.lng
+                        },
+                        info: address
+                    });
+                } catch (error) {
+                    console.error('Error setting search location:', error);
+                    Toastify.error("Please select a valid location");
+                }
             })
             .catch(() => {
                 Toastify.error("Please select a valid location");
             });
     };
+
 
     return (
         <PlacesAutocomplete
@@ -46,7 +56,7 @@ const LocationSearchInput = () => {
             onSelect={handleSelect}
         >
             {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                <div className='w-full md:w-[400px] relative'>
+                <div className='w-full relative'>
                     <input style={{ width: '100%', outline: 'none', padding: '0.5rem' }}
                         {...getInputProps({
                             placeholder: 'Search Places ...',

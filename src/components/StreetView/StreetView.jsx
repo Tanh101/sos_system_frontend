@@ -41,7 +41,6 @@ const StreetView = ({ requestPlace }) => {
 
     return (
         requestPlace?.location?.lat && requestPlace?.location?.lng ? (
-
             <div className="flex flex-col w-full">
                 <div className="flex flex-1">
                     <GoogleMap

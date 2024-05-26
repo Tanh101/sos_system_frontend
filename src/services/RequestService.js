@@ -8,7 +8,7 @@ const RequestService = () => {
 
     const { errorProcessor } = ErrorProcessService();
 
-    const getRequestType = async () => {
+    const getRequestType = async() => {
         try {
             const response = await api.get("/type");
             if (response.status === 200) {
@@ -20,29 +20,30 @@ const RequestService = () => {
         }
     };
 
-    const processRequestData = (data) => {
+    const processRequestData = (item) => {
         try {
-            console.log(data);
-            const data = {
-                requestTypeId: data.requestType,
-                content: data.content,
-                latitude: data.lat,
-                longitude: data.lng,
-                address: data.address,
-                isEmergency: data.isEmergency ? 1 : 0,
-                media: data.avatarResponses.map((item) => {
-                    return {
-                        item,
-                    };
-                }),
+            const res = {
+                id: item.id,
+                requestType: item.requestTypes.name,
+                content: item.content,
+                address: item.address,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                status: item.status,
+                createdAt: item.createdAt,
+                updatedAt: item.updatedAt,
+                media: item.requestMedia,
+                user: item.users,
+                isEmergency: item.isEmergency,
+                voteCount: item.voteCount,
             }
-            return data;
+            return res;
         } catch (error) {
             console.log(error);
         }
     };
 
-    const createRequest = async (data) => {
+    const createRequest = async(data) => {
         try {
             const media = data.avatarResponses.map(item => item);
 
@@ -92,7 +93,7 @@ const RequestService = () => {
         }
     };
 
-    const getRequests = async () => {
+    const getRequests = async() => {
         try {
             const response = await api.get("/requests");
             if (response.status === 200) {
@@ -109,7 +110,7 @@ const RequestService = () => {
         }
     };
 
-    const upvotePost = async (id) => {
+    const upvotePost = async(id) => {
         try {
             const response = await api.post(`/requests/${id}/vote`);
             if (response.status === 200) {
@@ -121,7 +122,7 @@ const RequestService = () => {
         }
     }
 
-    const downvotePost = async (id) => {
+    const downvotePost = async(id) => {
         try {
             const response = await api.delete(`/requests/${id}/vote`);
             if (response.status === 200) {
@@ -133,11 +134,11 @@ const RequestService = () => {
         }
     };
 
-    const getRequestDetail = async (id) => {
+    const getRequestDetail = async(id) => {
         try {
             const response = await api.get(`/requests/${id}`);
             if (response.status === 200) {
-                return response.data;
+                return processRequestData(response.data);
             }
         } catch (error) {
             console.log(error);

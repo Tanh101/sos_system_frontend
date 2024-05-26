@@ -22,6 +22,7 @@ const defaultMapContainerStyle = {
 const rescuerMarkerIconURL = "https://sossystem.s3.amazonaws.com/hopitalmarker.png";
 const userMarkerIconURL = "https://sossystem.s3.amazonaws.com/image.png";
 const requestMarkerIconURL = "https://sossystem.s3.us-east-1.amazonaws.com/1716474017690";
+const searchMarkerIconURL = "https://sossystem.s3.us-east-1.amazonaws.com/1716686540954";
 const EmergencyMapContainerStyle = {
     height: "40vh",
     width: "100%"
@@ -32,7 +33,7 @@ const fullWindowMapContainerStyle = {
 }
 
 const googleMapComponentOptions = {
-    disableDefaultUI: true,
+    disableDefaultUI: false,
     zoomControl: true
 };
 const mapLibraries = ["places"];
@@ -63,5 +64,6 @@ export {
     ServerURL,
     socketMessage,
     ChatbotUrl,
-    requestMarkerIconURL
+    requestMarkerIconURL,
+    searchMarkerIconURL
 }
