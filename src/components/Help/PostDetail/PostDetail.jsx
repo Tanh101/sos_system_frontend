@@ -1,22 +1,55 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faArrowDown,
-    faArrowUp, faClose,
+    faArrowLeft,
+    faArrowUp, faBackward, faClose,
     faComment, faEarth,
     faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import PropTypes from 'prop-types';
+import { useNavigate, useParams } from "react-router-dom";
+import { Image } from "antd";
+
 
 import avatar from '../../../assets/imgs/avatar.png';
-import postImage from '../../../assets/imgs/mitom.jpg';
 import RequestService from "../../../services/RequestService";
 import "./PostDetail.css";
 import { SPACE_CHARACTER } from "../../../constants/config";
 import { Toastify } from "../../../toastify/Toastify";
-import { Image } from "antd";
+import Loading from "../../Loading/Loading";
+import Photogrid from "react-facebook-photo-grid";
 
-const PostDetail = ({ close, post }) => {
+const PostDetail = () => {
+    const images = [
+        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
+        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
+        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
+        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
+        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
+        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
+    ];
+
+    const navigate = useNavigate();
+
+    const { getRequestDetail } = RequestService();
+    const { id } = useParams();
+    const [post, setPost] = useState(null);
+
+    useEffect(() => {
+        const fetchPostDetails = async () => {
+            try {
+                const postData = await getRequestDetail(id);
+                setPost(postData);
+            } catch (error) {
+                console.error('Failed to fetch post details:', error);
+            }
+        };
+
+        fetchPostDetails();
+    }, []);
+
+
     const [upvoteClicked, setUpvoteClicked] = useState(false);
     const [downvoteClicked, setDownvoteClicked] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
@@ -60,6 +93,8 @@ const PostDetail = ({ close, post }) => {
     };
 
 
+
+
     // useEffect(() => {
     //     const fetchPostDetail = async () => {
     //         const postDetail = await RequestService.getPostDetail(post.id);
@@ -68,16 +103,25 @@ const PostDetail = ({ close, post }) => {
     //     fetchPostDetail();
     // }, []);
 
+    const handleBackClick = () => {
+        navigate(-1);
+    }
+
     return (
-        <>
+        <div>
             {
                 post ? (
-                    <div className='bg-white items-center justify-center text-sm rounded-lg p-3 shadow-lg w-full mx-auto relative' >
-                        <div className="flex justify-between items-center text-xl font-bold pb-4 border-b">
-                            <p>{post?.user?.name}'s Post</p>
-                            <FontAwesomeIcon icon={faClose} className='cursor-pointer text-gray-600 hover:text-red-600' onClick={close} />
+                    <div className='bg-white justify-center text-sm rounded-lg px-3 shadow-lg w-full flex flex-col' >
+                        <div className="flex justify-between w-1/2 items-center text-xl font-bold pb-4">
+                            <div className="flex justify-center items-center">
+                                <FontAwesomeIcon icon={faArrowLeft} className="text-red-500 cursor-pointer px-2 py-1 rounded-full hover:bg-slate-100"
+                                    onClick={handleBackClick} />
+                                <p className="font-medium text-base">Back</p>
+                            </div>
+                            <p className="translate-x-1/2">{post?.user?.name}'s Post</p>
                         </div>
-                        <div className="flex flex-col overflow-y-auto">
+                        <p className="border-b"></p>
+                        <div className="flex flex-col overflow-y-auto h-screen">
                             <div className="flex flex-col my-2">
                                 <div className="flex justify-between items-center">
                                     <div className="flex justify-center items-center">
@@ -176,7 +220,7 @@ const PostDetail = ({ close, post }) => {
                             </div>
 
                         </div>
-                        <div className="flex mt-4 items-center">
+                        <div className="flex z-10 bottom-0 mt-4 items-center sticky bg-white">
                             <img src={avatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
                             <div className="flex flex-1 ml-2 p-2 border rounded-lg mx-2">
                                 <textarea
@@ -193,13 +237,8 @@ const PostDetail = ({ close, post }) => {
                         </div>
                     </div >
                 ) : (<Loading />)}
-        </>
+        </div>
     );
-};
-
-PostDetail.propTypes = {
-    close: PropTypes.func.isRequired,
-    post: PropTypes.object.isRequired,
 };
 
 export default PostDetail;

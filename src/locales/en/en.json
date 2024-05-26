@@ -30,13 +30,17 @@
         "Bình luận": "comments",
         "Khẩn cấp": "Emergency",
         "Bộ lọc": "Filter",
-        "Loại yêu cầu: ": "Request type: ",
+        "Loại yêu cầu": "Request type",
         "Tất cả": "All",
         "Đã được hỗ trợ": "Supported",
         "Đã hỗ trợ": "Accepted",
         "Đã bị từ chối": "Rejected",
         "Đã từ chối": "Refused",
         "Thông tin cá nhân": "Profile",
-        "Yêu cầu của tôi" : "My Requests"
+        "Yêu cầu của tôi": "My Requests",
+        "Trạng thái yêu cầu": "Request status",
+        "Khu vực": "Area",
+        "Đang chờ": "Pending",
+        "Đang cứu hộ": "Rescuing"
     }
 }

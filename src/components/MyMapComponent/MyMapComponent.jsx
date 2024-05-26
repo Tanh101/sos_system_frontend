@@ -8,7 +8,7 @@ import Loading from "../Loading/Loading";
 import PlaceService from "../../services/PlaceService";
 import { googleMapComponentOptions, mapLibraries, googleMapApiKey } from "../../constants/config";
 
-const MyMapComponent = ({ mapContainerStyle }) => {
+const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
     const { getRescuerPlaces } = PlaceService();
 
     const { location } = useContext(UserContext);
@@ -43,10 +43,10 @@ const MyMapComponent = ({ mapContainerStyle }) => {
             <GoogleMap
                 id="map"
                 mapContainerStyle={mapContainerStyle}
-                zoom={12}
+                zoom={14}
                 center={{
-                    lat: location.lat,
-                    lng: location.lng
+                    lat: searchLocation?.location?.lat || location.lat,
+                    lng: searchLocation?.location?.lng || location.lng,
                 }}
                 options={googleMapComponentOptions}
                 onLoad={onMapLoad}
@@ -54,6 +54,7 @@ const MyMapComponent = ({ mapContainerStyle }) => {
                 <PlaceInfo
                     userPlace={{ info: location.address, location: { lat: location.lat, lng: location.lng } }}
                     rescuerPlaces={rescuerPlaces}
+                    searchLocation={searchLocation}
                     isDraggable={false} />
             </GoogleMap>
         ) : (
@@ -65,5 +66,6 @@ const MyMapComponent = ({ mapContainerStyle }) => {
 export default MyMapComponent;
 
 MyMapComponent.propTypes = {
-    mapContainerStyle: PropTypes.object.isRequired
+    mapContainerStyle: PropTypes.object.isRequired,
+    searchLocation: PropTypes.object
 }
