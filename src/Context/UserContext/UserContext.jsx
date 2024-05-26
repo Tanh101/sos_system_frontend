@@ -3,10 +3,12 @@ import { createContext, useEffect, useState } from 'react';
 import GoogleMapService from '../../services/GoogleMapService';
 import SocketService from '../../services/SocketService';
 import AuthService from '../../services/AuthService';
+import { useNavigate } from 'react-router-dom';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+    const navigate = useNavigate();
     const { getUserProfile } = AuthService();
 
     const { ReverseGeocoding } = GoogleMapService();
@@ -61,6 +63,10 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         if (user && user.role === 'rescuer') {
             notifyRescuerJoin(user._id);
+        }
+        if (user && user.role === 'admin') {
+            setActiveItem('dashboard');
+            navigate("/dashboard");
         }
     }, [user]);
 

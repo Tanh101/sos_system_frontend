@@ -1,40 +1,88 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+    faAngleDown,
+    faAngleUp,
     faArrowDown,
     faArrowLeft,
     faArrowUp, faBackward, faClose,
-    faComment, faEarth,
+    faComment, faDotCircle, faEarth,
+    faEllipsis,
+    faLocation,
+    faLocationDot,
+    faMapLocation,
     faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import PropTypes from 'prop-types';
 import { useNavigate, useParams } from "react-router-dom";
-import { Image } from "antd";
+import { Dropdown, Space, Image } from 'antd';
 
 
 import avatar from '../../../assets/imgs/avatar.png';
 import RequestService from "../../../services/RequestService";
 import "./PostDetail.css";
-import { SPACE_CHARACTER } from "../../../constants/config";
 import { Toastify } from "../../../toastify/Toastify";
 import Loading from "../../Loading/Loading";
-import Photogrid from "react-facebook-photo-grid";
+import { DownOutlined } from "@ant-design/icons";
+import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
+import Popup from "reactjs-popup";
+import Direction from "../../Direction/Direction";
 
 const PostDetail = () => {
-    const images = [
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-    ];
-
     const navigate = useNavigate();
+    const { id } = useParams();
 
     const { getRequestDetail } = RequestService();
-    const { id } = useParams();
     const [post, setPost] = useState(null);
+    const [isOpenStreetView, setIsOpenStreetView] = useState(false);
+    const [requestPlace, setRequestPlace] = useState({});
+
+    const handleStreetViewClick = (event, item) => {
+        event.stopPropagation();
+        setRequestPlace({
+            location: {
+                lat: parseFloat(item.latitude),
+                lng: parseFloat(item.longitude),
+            },
+            info: item.address
+        });
+        setIsOpenStreetView(true);
+    }
+
+    const handleMessageClick = (event) => {
+        event.stopPropagation();
+        navigate('/message');
+    };
+
+    const items = [
+        {
+            key: '1',
+            label: (
+                <button onClick={handleMessageClick}>
+                    Chỉnh sửa
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faEdit} color="red" />,
+        },
+        {
+            key: '2',
+            label: (
+                <button onClick={handleMessageClick}>
+                    Nhắn tin
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faMessage} color="red" />,
+        },
+        {
+            key: '3',
+            label: (
+                <button onClick={(event) => handleStreetViewClick(event, post)}>
+                    Xem vị trí
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faLocationDot} color="red" />,
+        }
+    ];
+
 
     useEffect(() => {
         const fetchPostDetails = async () => {
@@ -134,14 +182,26 @@ const PostDetail = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="flex">
+                                        <Dropdown
+                                            menu={{
+                                                items,
+                                            }}
+                                            placement="bottom"
+                                        >
+                                            <FontAwesomeIcon icon={faEllipsis} size="lg" className='text-red-500 cursor-pointer' onClick={(e) => e.preventDefault()} />
+                                        </Dropdown>
+
+
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center items-start ml-2">
                                 <p className="text-base mt-2">{post?.content}</p>
                                 {post?.media?.length > 0 && (
-                                    <div className="flex justify-start w-full">
+                                    <div className="flex justify-start w-[1200px] flex-1 flex-wrap">
                                         {post?.media.map((media, index) => (
-                                            <Image key={index} width={400} src={media.url} alt="Post" className="rounded-lg mt-4" />
+                                            <Image key={index} width={300} height={200} src={media.url} alt="Post" className="rounded-lg mt-4" />
                                         ))}
                                     </div>
                                 )}
@@ -156,7 +216,7 @@ const PostDetail = () => {
                                             disabled={loading}
                                         >
                                             <FontAwesomeIcon
-                                                icon={faArrowUp}
+                                                icon={faAngleUp}
                                                 color={upvoteClicked ? 'red' : 'black'}
                                                 className="hover:text-red-500"
                                             />
@@ -170,7 +230,7 @@ const PostDetail = () => {
                                             disabled={loading}
                                         >
                                             <FontAwesomeIcon
-                                                icon={faArrowDown}
+                                                icon={faAngleDown}
                                                 color={downvoteClicked ? 'red' : 'black'}
                                                 className="hover:text-red-500"
                                             />
@@ -236,8 +296,28 @@ const PostDetail = () => {
                             </div>
                         </div>
                     </div >
-                ) : (<Loading />)}
-        </div>
+                ) : (<Loading />)
+            }
+            {isOpenStreetView && (
+                <Popup
+                    open={isOpenStreetView}
+                    onClose={() => setIsOpenStreetView(false)}
+                    modal
+                    nested
+                    contentStyle={{ borderRadius: '10px', width: '80%', height: '60%' }}
+                >
+                    <div className="flex flex-col items-center px-10">
+                        <div className="flex justify-between items-center w-full">
+                            <p>Chi tiết địa chỉ</p>
+                            <button onClick={() => setIsOpenStreetView(false)} className="self-end px-4 py-2 text-red-600 hover:text-red-800">
+                                <FontAwesomeIcon icon={faClose} size="lg" />
+                            </button>
+                        </div>
+                        <Direction />
+                    </div>
+                </Popup>
+            )}
+        </div >
     );
 };
 

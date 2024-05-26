@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMessage, faComment } from '@fortawesome/free-regular-svg-icons';
-import { faArrowDown, faArrowUp, faCheck, faClose, faRemove, faSearch, faStreetView, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faAngleDown, faAngleUp, faCheck, faRemove, faSearch, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -12,75 +11,38 @@ import RequestService from '../../../services/RequestService';
 import { Toastify } from '../../../toastify/Toastify';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../../Context/UserContext/UserContext';
-import Direction from '../../Direction/Direction';
 import FormRequest from '../../Emergency/FormRequest/FormRequest';
+import { VOTE_TYPE } from '../../../constants/config';
 
-const Post = ({ requests, realTimeRequest }) => {
-    const images = [
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-        "https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg",
-    ];
-
+const Post = ({ requests, setRequests, realTimeRequest }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { upvotePost, downvotePost } = RequestService();
+    const { vote } = RequestService();
     const { user, sendResponseToClient } = useContext(UserContext);
 
-    const [upvoteClicked, setUpvoteClicked] = useState(null);
-    const [downvoteClicked, setDownvoteClicked] = useState(null);
-    const [isOpenStreetView, setIsOpenStreetView] = useState(false);
-    const [requestPlace, setRequestPlace] = useState({});
     const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState('');
 
-    const handleUpvoteClick = async (event, item) => {
+    const handleVoteClick = async (event, item, voteType) => {
         event.stopPropagation();
         setLoading(true);
         try {
-            await upvotePost(item.id);
-            setUpvoteClicked(!upvoteClicked);
-            if (downvoteClicked) setDownvoteClicked(false);
+            // Check if the current voteType is the same as the clicked voteType
+            const newVoteType = item.voteType === voteType ? VOTE_TYPE.none : voteType;
+            const response = await vote(item.id, newVoteType);
+            item.voteCount = response;
+            item.voteType = newVoteType;
+            setRequests((prevRequests) => ({
+                ...prevRequests,
+                requests: prevRequests.requests.map((req) =>
+                    req.id === item.id ? { ...req, voteCount: response, voteType: newVoteType } : req
+                ),
+            }));
         } catch (err) {
-            Toastify.error('Failed to upvote');
+            Toastify.error('Failed to vote');
         } finally {
             setLoading(false);
         }
     };
-
-    const handleDownvoteClick = async (event, item) => {
-        event.stopPropagation();
-        setLoading(true);
-        try {
-            await downvotePost(item.id);
-            setDownvoteClicked(!downvoteClicked);
-            if (upvoteClicked) setUpvoteClicked(false);
-        } catch (err) {
-            Toastify.error('Failed to downvote');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleMessageClick = (event) => {
-        event.stopPropagation();
-        navigate('/message');
-    };
-
-    const handleStreetViewClick = (event, item) => {
-        event.stopPropagation();
-        setRequestPlace({
-            location: {
-                lat: parseFloat(item.latitude),
-                lng: parseFloat(item.longitude),
-            },
-            info: item.address
-        });
-        setIsOpenStreetView(true);
-    }
 
     const handleResponse = (event) => {
         const clientId = realTimeRequest[0]?.clientId;
@@ -100,16 +62,12 @@ const Post = ({ requests, realTimeRequest }) => {
                     <FontAwesomeIcon icon={faSearch} color='red' size='lg' />
                     <input className="outline-none w-full ml-2"
                         type="text"
-                        value={search}
                         placeholder={t("Tìm kiếm yêu cầu...")}
                         onChange={(e) => setSearch(e.target.value)} />
                 </div>
                 <div className="flex justify-center items-center">
                     <Popup
-                        trigger={
-
-                            <button className="p-2 bg-red-600 text-white rounded-2xl">{t("Tạo yêu cầu")}</button>
-                        }
+                        trigger={<button className="p-2 bg-red-600 text-white rounded-2xl">{t("Tạo yêu cầu")}</button>}
                         modal
                         nested
                         contentStyle={{ borderRadius: '10px' }}
@@ -134,65 +92,54 @@ const Post = ({ requests, realTimeRequest }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex">
-                                <button className="mx-4" onClick={handleMessageClick}>
-                                    <FontAwesomeIcon icon={faMessage} color="red" size="lg" />
-                                </button>
-                                <button onClick={(event) => handleStreetViewClick(event, item)}>
-                                    <FontAwesomeIcon icon={faStreetView} color="red" size="xl" />
-                                </button>
-                            </div>
+                            <div className="flex"></div>
                         </div>
-                        {item.isEmergency ? (
+                        {item.isEmergency && (
                             <div className="flex justify-start items-center mt-4">
                                 <FontAwesomeIcon icon={faWarning} color="red" />
                                 <p className="text-[#F73334] mx-2">{t("Khẩn cấp")}</p>
                             </div>
-                        ) : null}
+                        )}
                         <div className="flex my-2">
                             <p>{item.content}</p>
                         </div>
                         {item?.media?.length > 0 && (
                             <div className="grid grid-cols-3 gap-4 mt-2">
                                 {item.media.map((media, index) => (
-                                    <img key={index} width={400} src={media?.url} alt="Post" className="h-auto rounded-lg" />
+                                    <img key={index} width={300} height={300} src={media?.url} alt="Post" className="rounded-lg" />
                                 ))}
                             </div>
                         )}
                         <div className="flex justify-between items-center mt-4">
-                            <div className="flex items-center">
-                                <div className="flex rounded-2xl border border-slate-300">
+                            <div className="flex items-center ">
+                                <div className="flex justify-center items-center rounded-2xl border border-slate-300">
                                     <button
-                                        className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                        onClick={(event) => handleUpvoteClick(event, item)}
+                                        className={`hover:rounded-2xl hover:bg-slate-200 px-2 py-1 ${item.voteType === VOTE_TYPE.upvote ? 'text-red-500' : ''}`}
+                                        onClick={(event) => handleVoteClick(event, item, VOTE_TYPE.upvote)}
                                         disabled={loading}
                                     >
                                         <FontAwesomeIcon
-                                            icon={faArrowUp}
-                                            color={upvoteClicked ? 'red' : 'black'}
-                                            className="hover:text-red-500"
+                                            icon={faAngleUp}
                                         />
                                     </button>
-                                    <p className="mx-2">{item.voteCount}</p>
+                                    <p className="mx-1 text-md">{item.voteCount}</p>
                                     <button
-                                        className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                        onClick={(event) => handleDownvoteClick(event, item)}
+                                        className={`hover:rounded-2xl hover:bg-slate-200 px-2 py-1 ${item.voteType === VOTE_TYPE.downvote ? 'text-red-500' : ''}`}
+                                        onClick={(event) => handleVoteClick(event, item, VOTE_TYPE.downvote)}
                                         disabled={loading}
                                     >
                                         <FontAwesomeIcon
-                                            icon={faArrowDown}
-                                            color={downvoteClicked ? 'red' : 'black'}
-                                            className="hover:text-red-500"
+                                            icon={faAngleDown}
                                         />
                                     </button>
                                 </div>
                                 <div className="flex m-4">
-                                    <div className="flex justify-center items-center rounded-lg border border-slate-300">
+                                    <div className="flex justify-center items-center rounded-2xl border border-slate-300 px-2">
                                         <FontAwesomeIcon
-                                            className='cursor-pointer px-2 py-2 hover:bg-slate-100 rounded-2xl'
+                                            className='cursor-pointer pl-2 py-2 rounded-2xl'
                                             icon={faComment} color="red" size='lg'
                                         />
-                                        <p className='text-md text-slate-500 ml-2'>12 {t('bình luận')}</p>
+                                        <p className='text-sm font-bold text-slate-500 px-2'>12</p>
                                     </div>
                                 </div>
                             </div>
@@ -216,31 +163,13 @@ const Post = ({ requests, realTimeRequest }) => {
                     </div>
                 </div>
             ))}
-            {isOpenStreetView && (
-                <Popup
-                    open={isOpenStreetView}
-                    onClose={() => setIsOpenStreetView(false)}
-                    modal
-                    nested
-                    contentStyle={{ borderRadius: '10px', width: '80%', height: '60%' }}
-                >
-                    <div className="flex flex-col items-center px-10">
-                        <div className="flex justify-between items-center w-full">
-                            <p>Chi tiết địa chỉ</p>
-                            <button onClick={() => setIsOpenStreetView(false)} className="self-end px-4 py-2 text-red-600 hover:text-red-800">
-                                <FontAwesomeIcon icon={faClose} size="lg" />
-                            </button>
-                        </div>
-                        <Direction />
-                    </div>
-                </Popup>
-            )}
         </div>
     );
 };
 
 Post.propTypes = {
     requests: PropTypes.object.isRequired,
+    setRequests: PropTypes.func.isRequired,
     realTimeRequest: PropTypes.array
 };
 

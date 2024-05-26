@@ -79,6 +79,7 @@ const Help = () => {
     if (loading) {
         return <Loading />
     }
+
     return (
         <UserMarkerPlaceProvider>
             <div className="flex flex-col flex-1 bg-white overflow-y-auto">
@@ -90,7 +91,7 @@ const Help = () => {
                         }
                         {requests &&
                             <Routes>
-                                <Route path="" element={<Post requests={requests} realTimeRequest={realTimeRequest}
+                                <Route path="" element={<Post requests={requests} setRequests={setRequests} realTimeRequest={realTimeRequest}
                                     setSelectedRequest={setSelectedRequest} />} />
                                 <Route path="/detail/:id" element={<PostDetail />} />
                             </Routes>

@@ -8,7 +8,7 @@ const RequestService = () => {
 
     const { errorProcessor } = ErrorProcessService();
 
-    const getRequestType = async() => {
+    const getRequestType = async () => {
         try {
             const response = await api.get("/type");
             if (response.status === 200) {
@@ -43,7 +43,7 @@ const RequestService = () => {
         }
     };
 
-    const createRequest = async(data) => {
+    const createRequest = async (data) => {
         try {
             const media = data.avatarResponses.map(item => item);
 
@@ -86,6 +86,7 @@ const RequestService = () => {
                     user: item.users,
                     isEmergency: item.isEmergency,
                     voteCount: item.voteCount,
+                    voteType: item?.votes[0]?.voteType
                 };
             });
         } catch (error) {
@@ -93,7 +94,7 @@ const RequestService = () => {
         }
     };
 
-    const getRequests = async() => {
+    const getRequests = async () => {
         try {
             const response = await api.get("/requests");
             if (response.status === 200) {
@@ -110,9 +111,12 @@ const RequestService = () => {
         }
     };
 
-    const upvotePost = async(id) => {
+    const vote = async (id, voteType) => {
         try {
-            const response = await api.post(`/requests/${id}/vote`);
+            const response = await api.post(`/requests/${id}/vote`, {
+                voteType
+            });
+
             if (response.status === 200) {
                 return response.data.voteCount;
             }
@@ -122,19 +126,7 @@ const RequestService = () => {
         }
     }
 
-    const downvotePost = async(id) => {
-        try {
-            const response = await api.delete(`/requests/${id}/vote`);
-            if (response.status === 200) {
-                return response.data.voteCount;
-            }
-        } catch (error) {
-            console.log(error);
-            errorProcessor(error);
-        }
-    };
-
-    const getRequestDetail = async(id) => {
+    const getRequestDetail = async (id) => {
         try {
             const response = await api.get(`/requests/${id}`);
             if (response.status === 200) {
@@ -150,8 +142,7 @@ const RequestService = () => {
         getRequestType,
         createRequest,
         getRequests,
-        upvotePost,
-        downvotePost,
+        vote,
         getRequestDetail,
     };
 };
