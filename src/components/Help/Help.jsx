@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { Select } from "antd";
 import { useTranslation } from "react-i18next";
 import Popup from "reactjs-popup";
@@ -16,6 +16,7 @@ import PostDetail from "./PostDetail/PostDetail";
 
 const Help = () => {
     const { t } = useTranslation();
+    const location = useLocation();
 
     const { getRequests, getRequestType } = RequestService();
 
@@ -64,7 +65,7 @@ const Help = () => {
     useEffect(() => {
         setActiveItem('help');
         fetchRequests();
-    }, []);
+    }, [location]);
 
 
     useEffect(() => {

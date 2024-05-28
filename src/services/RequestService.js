@@ -25,6 +25,7 @@ const RequestService = () => {
             const res = {
                 id: item.id,
                 requestType: item.requestTypes.name,
+                requestTypeIcon: item.requestTypes.iconUrl,
                 content: item.content,
                 address: item.address,
                 latitude: item.latitude,
@@ -36,6 +37,7 @@ const RequestService = () => {
                 user: item.users,
                 isEmergency: item.isEmergency,
                 voteCount: item.voteCount,
+                distance: item.distance,
             }
             return res;
         } catch (error) {
@@ -75,6 +77,7 @@ const RequestService = () => {
                 return {
                     id: item.id,
                     requestType: item.requestTypes.name,
+                    requestTypeIcon: item.requestTypes.iconUrl,
                     content: item.content,
                     address: item.address,
                     latitude: item.latitude,
@@ -86,7 +89,8 @@ const RequestService = () => {
                     user: item.users,
                     isEmergency: item.isEmergency,
                     voteCount: item.voteCount,
-                    voteType: item?.votes[0]?.voteType
+                    voteType: item?.votes[0]?.voteType,
+                    distance: item?.distance,
                 };
             });
         } catch (error) {

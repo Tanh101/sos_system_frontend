@@ -2,39 +2,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faAngleDown,
     faAngleUp,
-    faArrowDown,
     faArrowLeft,
-    faArrowUp, faBackward, faClose,
-    faComment, faDotCircle, faEarth,
+    faClose,
+    faComment,
+    faEarth,
     faEllipsis,
-    faLocation,
     faLocationDot,
-    faMapLocation,
     faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Dropdown, Space, Image } from 'antd';
+import Popup from "reactjs-popup";
+import { Dropdown, Image } from 'antd';
+import { useTranslation } from "react-i18next";
 
-
+import "./PostDetail.css";
 import avatar from '../../../assets/imgs/avatar.png';
 import RequestService from "../../../services/RequestService";
-import "./PostDetail.css";
 import { Toastify } from "../../../toastify/Toastify";
 import Loading from "../../Loading/Loading";
-import { DownOutlined } from "@ant-design/icons";
-import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
-import Popup from "reactjs-popup";
 import Direction from "../../Direction/Direction";
+import { VOTE_TYPE } from "../../../constants/config";
+import { formatHHmm } from "../../../utilities/formatDate";
 
 const PostDetail = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { t } = useTranslation();
 
-    const { getRequestDetail } = RequestService();
+    const { getRequestDetail, vote } = RequestService();
+
     const [post, setPost] = useState(null);
     const [isOpenStreetView, setIsOpenStreetView] = useState(false);
     const [requestPlace, setRequestPlace] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [input, setInput] = useState('');
 
     const handleStreetViewClick = (event, item) => {
         event.stopPropagation();
@@ -58,7 +61,7 @@ const PostDetail = () => {
             key: '1',
             label: (
                 <button onClick={handleMessageClick}>
-                    Chỉnh sửa
+                    {t("Chỉnh sửa")}
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faEdit} color="red" />,
@@ -67,7 +70,7 @@ const PostDetail = () => {
             key: '2',
             label: (
                 <button onClick={handleMessageClick}>
-                    Nhắn tin
+                    {t("Nhắn tin")}
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faMessage} color="red" />,
@@ -76,7 +79,7 @@ const PostDetail = () => {
             key: '3',
             label: (
                 <button onClick={(event) => handleStreetViewClick(event, post)}>
-                    Xem vị trí
+                    {t("Xem vị trí")}
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faLocationDot} color="red" />,
@@ -98,58 +101,23 @@ const PostDetail = () => {
     }, []);
 
 
-    const [upvoteClicked, setUpvoteClicked] = useState(false);
-    const [downvoteClicked, setDownvoteClicked] = useState(false);
-    const [voteCount, setVoteCount] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [input, setInput] = useState('');
 
-    const { upvotePost, downvotePost } = RequestService();
-
-    const handleUpvoteClick = async (event) => {
+    const handleVote = async (event, voteType) => {
         event.stopPropagation();
         setLoading(true);
         try {
-            // const newVoteCount = await upvotePost(item.id);
-            // setVoteCount(newVoteCount);
-            setUpvoteClicked(!upvoteClicked);
-            if (downvoteClicked) {
-                setDownvoteClicked(false);
-            }
+            const response = await vote(id, voteType);
+            setPost((prevPost) => ({
+                ...prevPost,
+                voteCount: response,
+            }));
+
         } catch (err) {
             Toastify.error('Failed to upvote');
         } finally {
             setLoading(false);
         }
     };
-
-    const handleDownvoteClick = async (event) => {
-        event.stopPropagation();
-        setLoading(true);
-        try {
-            // const newVoteCount = await downvotePost(item.id);
-            // setVoteCount(newVoteCount);
-            setDownvoteClicked(!downvoteClicked);
-            if (upvoteClicked) {
-                setUpvoteClicked(false);
-            }
-        } catch (err) {
-            Toastify.error('Failed to downvote');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-
-
-    // useEffect(() => {
-    //     const fetchPostDetail = async () => {
-    //         const postDetail = await RequestService.getPostDetail(post.id);
-    //         setVoteCount(postDetail.voteCount);
-    //     };
-    //     fetchPostDetail();
-    // }, []);
 
     const handleBackClick = () => {
         navigate(-1);
@@ -164,7 +132,7 @@ const PostDetail = () => {
                             <div className="flex justify-center items-center">
                                 <FontAwesomeIcon icon={faArrowLeft} className="text-red-500 cursor-pointer px-2 py-1 rounded-full hover:bg-slate-100"
                                     onClick={handleBackClick} />
-                                <p className="font-medium text-base">Back</p>
+                                <p className="font-medium text-base">{t("Trở về")}</p>
                             </div>
                             <p className="translate-x-1/2">{post?.user?.name}'s Post</p>
                         </div>
@@ -177,8 +145,9 @@ const PostDetail = () => {
                                         <div className="flex flex-col ml-2">
                                             <p className="text-lg font-bold">{post?.user?.name}</p>
                                             <div className="flex items-center">
-                                                <p className="text-sm text-gray-600">20m</p>
-                                                <FontAwesomeIcon icon={faEarth} className='text-slate-500 ml-2' />
+                                                <p className="text-sm text-gray-600">{`${post.distance}km`}</p>
+                                                <FontAwesomeIcon icon={faEarth} className='text-slate-500 mx-1' />
+                                                <p className="text-sm text-gray-600">{formatHHmm(post.updatedAt)}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -189,19 +158,23 @@ const PostDetail = () => {
                                             }}
                                             placement="bottom"
                                         >
-                                            <FontAwesomeIcon icon={faEllipsis} size="lg" className='text-red-500 cursor-pointer' onClick={(e) => e.preventDefault()} />
+                                            <FontAwesomeIcon icon={faEllipsis} size="lg" className='text-red-500 cursor-pointer'
+                                                onClick={(e) => e.preventDefault()} />
                                         </Dropdown>
-
-
                                     </div>
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center items-start ml-2">
+                                <div className="flex justify-center items-center border rounded-lg p-1 shadow-md">
+                                    <img className="border-red-500" width={30} src={post.requestTypeIcon} alt="" />
+                                    <p className="mx-1 font-bold text-red-600">{post.requestType}</p>
+                                </div>
                                 <p className="text-base mt-2">{post?.content}</p>
                                 {post?.media?.length > 0 && (
                                     <div className="flex justify-start w-[1200px] flex-1 flex-wrap">
                                         {post?.media.map((media, index) => (
-                                            <Image key={index} width={300} height={200} src={media.url} alt="Post" className="rounded-lg mt-4" />
+                                            <Image key={index} width={300} height={200} src={media.url} alt="Post"
+                                                className="rounded-lg mt-4" loading="lazy" />
                                         ))}
                                     </div>
                                 )}
@@ -212,26 +185,26 @@ const PostDetail = () => {
                                     <div className="flex justify-center items-center">
                                         <button
                                             className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                            onClick={handleUpvoteClick}
+                                            onClick={(event) => handleVote(event, VOTE_TYPE.upvote)}
                                             disabled={loading}
                                         >
                                             <FontAwesomeIcon
                                                 icon={faAngleUp}
-                                                color={upvoteClicked ? 'red' : 'black'}
+                                                color={post.voteType === VOTE_TYPE.upvote ? 'red' : 'black'}
                                                 className="hover:text-red-500"
                                             />
                                         </button>
-                                        <p className="mx-2">{voteCount}</p>
+                                        <p className="mx-2">{post.voteCount}</p>
                                     </div>
                                     <div className="flex justify-center items-center">
                                         <button
                                             className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                            onClick={handleDownvoteClick}
+                                            onClick={(event) => handleVote(event, VOTE_TYPE.downvote)}
                                             disabled={loading}
                                         >
                                             <FontAwesomeIcon
                                                 icon={faAngleDown}
-                                                color={downvoteClicked ? 'red' : 'black'}
+                                                color={post.voteType === VOTE_TYPE.downvote ? 'red' : 'black'}
                                                 className="hover:text-red-500"
                                             />
                                         </button>
@@ -241,7 +214,7 @@ const PostDetail = () => {
                                     <div className="flex justify-center items-center rounded-lg border-slate-300">
                                         <FontAwesomeIcon className='cursor-pointer px-2 py-2 hover:bg-slate-100 rounded-2xl'
                                             icon={faComment} color="red" size='sm' />
-                                        <p className='mx-2'>15 comments</p>
+                                        <p className='mx-2'>15 {t("comments")}</p>
                                     </div>
                                 </div>
                             </div>
@@ -296,7 +269,9 @@ const PostDetail = () => {
                             </div>
                         </div>
                     </div >
-                ) : (<Loading />)
+                ) : (
+                    <Loading />
+                )
             }
             {isOpenStreetView && (
                 <Popup
@@ -308,7 +283,7 @@ const PostDetail = () => {
                 >
                     <div className="flex flex-col items-center px-10">
                         <div className="flex justify-between items-center w-full">
-                            <p>Chi tiết địa chỉ</p>
+                            <p>{t("Thông tin địa chỉ")}</p>
                             <button onClick={() => setIsOpenStreetView(false)} className="self-end px-4 py-2 text-red-600 hover:text-red-800">
                                 <FontAwesomeIcon icon={faClose} size="lg" />
                             </button>

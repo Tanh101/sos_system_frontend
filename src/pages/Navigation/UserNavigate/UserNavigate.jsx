@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
-import { UserProvider } from "../../../Context/UserContext/UserContext";
 import { LocaleProvider } from "../../../Context/LocaleContext/LocaleContext";
 import AuthService from "../../../services/AuthService";
 
@@ -35,40 +34,38 @@ const UserNavigation = () => {
 
     return (
         <LocaleProvider>
-            <UserProvider>
-                <div className="flex fixed w-full h-screen font-roboto bg-white">
-                    <div className="flex bg-white flex-col flex-1">
-                        <Navbar />
-                        <Chatbot />
-                        {user && user.role === 'admin' ? (
-                            <div className="flex bg-slate-100">
-                                <AdminSideBar />
-                                <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
-                                    <Routes>
-                                        <Route path="/dashboard" element={<Dashboard />} />
-                                        <Route path="/admin" element={<Account />} />
-                                        <Route path="/chatbot" element={<ManageChatbot />} />
+            <div className="flex fixed w-full h-screen font-roboto bg-white">
+                <div className="flex bg-white flex-col flex-1">
+                    <Navbar />
+                    <Chatbot />
+                    {user && user.role === 'admin' ? (
+                        <div className="flex bg-slate-100">
+                            <AdminSideBar />
+                            <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
+                                <Routes>
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/admin" element={<Account />} />
+                                    <Route path="/chatbot" element={<ManageChatbot />} />
 
-                                    </Routes>
-                                </Suspense>
-                            </div>
-                        ) : (
-                            <div className="flex">
-                                <Sidebar />
-                                <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
-                                    <Routes>
-                                        <Route path="/help/*" element={<Help />} />
-                                        <Route path="/location" element={<Location />} />
-                                        <Route path="/messages" element={<Inbox />} />
-                                        <Route path="/profile/*" element={<Profile />} />
-                                        <Route path="/" element={<Home />} />
-                                    </Routes>
-                                </Suspense>
-                            </div>
-                        )}
-                    </div>
+                                </Routes>
+                            </Suspense>
+                        </div>
+                    ) : (
+                        <div className="flex">
+                            <Sidebar />
+                            <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
+                                <Routes>
+                                    <Route path="/help/*" element={<Help />} />
+                                    <Route path="/location" element={<Location />} />
+                                    <Route path="/messages" element={<Inbox />} />
+                                    <Route path="/profile/*" element={<Profile />} />
+                                    <Route path="/" element={<Home />} />
+                                </Routes>
+                            </Suspense>
+                        </div>
+                    )}
                 </div>
-            </UserProvider >
+            </div>
         </LocaleProvider>
     );
 }

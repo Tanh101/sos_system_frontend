@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../../Context/UserContext/UserContext';
 import FormRequest from '../../Emergency/FormRequest/FormRequest';
 import { VOTE_TYPE } from '../../../constants/config';
+import { formatHHmm } from '../../../utilities/formatDate';
 
 const Post = ({ requests, setRequests, realTimeRequest }) => {
     const { t } = useTranslation();
@@ -78,28 +79,33 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
             </div>
             {requests?.requests?.length > 0 && requests.requests.map((item, index) => (
                 <div key={index}
-                    className="flex flex-col bg-white hover:bg-slate-50 rounded-xl mx-5 mt-2 py-2 w-auto cursor-pointer"
+                    className="flex flex-col bg-white hover:bg-slate-50 rounded-xl mx-5 mt-1 py-1 w-auto cursor-pointer"
                     onClick={() => handlePostClick(item)}>
                     <div className={`flex flex-col mb-3 shadow-md rounded-lg border m-2 p-4 bg-white ${item.isEmergency ? 'border-[#F73334] border' : ''}`}>
                         <div className="flex justify-between items-center">
                             <div className="flex">
-                                <img width={58} src={item.user?.avatar || avatar} alt="" />
+                                <img width={58} src={item.user?.avatar || avatar} alt="" loading='lazy' />
                                 <div className="flex flex-col ml-2">
                                     <p>{item.user?.name}</p>
                                     <div className="flex text-slate-400">
-                                        <p className='mr-2'>10km</p>
-                                        <p>18:30</p>
+                                        <p className='mr-2'>{`${item.distance}km`}</p>
+                                        <p>{formatHHmm(item.updatedAt)}</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex"></div>
                         </div>
-                        {item.isEmergency && (
+                        {item.isEmergency ? (
                             <div className="flex justify-start items-center mt-4">
                                 <FontAwesomeIcon icon={faWarning} color="red" />
-                                <p className="text-[#F73334] mx-2">{t("Khẩn cấp")}</p>
+                                <p className="text-[#F73334] ml-2">{t("Khẩn cấp")}</p>
                             </div>
-                        )}
+                        ) : null}
+                        <div className="flex justify-start mt-4 items-center w-full">
+                            <div className="flex w-auto border rounded-lg shadow-md p-1">
+                                <img className="border-red-500" width={20} src={item.requestTypeIcon} alt="" />
+                                <p className="mx-1 font-medium text-sm text-red-600">{item.requestType}</p></div>
+                        </div>
                         <div className="flex my-2">
                             <p>{item.content}</p>
                         </div>
