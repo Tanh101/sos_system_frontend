@@ -41,6 +41,18 @@
         "Trạng thái yêu cầu": "Request status",
         "Khu vực": "Area",
         "Đang chờ": "Pending",
-        "Đang cứu hộ": "Rescuing"
+        "Đang cứu hộ": "Rescuing",
+        "Thông tin vị trí" : "Location information",
+        "Chỉnh sửa": "Edit",
+        "Xóa": "Delete",
+        "Vị trí": "Location",
+        "Tạo yêu cầu mới": "Create new request",
+        "Nhắn tin": "Chat",
+        "Hủy yêu cầu": "Cancel request",
+        "Đã hủy": "Cancelled",
+        "Đã hoàn thành": "Completed",
+        "Đã chấp nhận": "Accepted",
+        "Xem vị trí": "View location"
+
     }
 }

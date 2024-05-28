@@ -49,6 +49,12 @@ const socketMessage = {
     RESCUER_RESPONSE: "rescuerResponse",
 }
 
+const VOTE_TYPE = {
+    "upvote": 1,
+    "downvote": 0,
+    "none": 2,
+}
+
 export {
     AppBaseUrl,
     SPACE_CHARACTER,
@@ -65,5 +71,6 @@ export {
     socketMessage,
     ChatbotUrl,
     requestMarkerIconURL,
-    searchMarkerIconURL
+    searchMarkerIconURL,
+    VOTE_TYPE,
 }
