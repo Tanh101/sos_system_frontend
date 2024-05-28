@@ -1,17 +1,20 @@
 import { createContext, useEffect, useState } from 'react';
 
-import GoogleMapService from '../../services/GoogleMapService';
 import SocketService from '../../services/SocketService';
 import AuthService from '../../services/AuthService';
 import { useNavigate } from 'react-router-dom';
+import socketInstance from '../../utilities/socketInstance';
+import LocationService from '../../services/LocationService';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const navigate = useNavigate();
+
+    const { getCurrentUserLocation, createOrUpdateUserLocation } = LocationService();
     const { getUserProfile } = AuthService();
 
-    const { ReverseGeocoding } = GoogleMapService();
+    const { connectSocket, disconnectSocket } = socketInstance();
 
     const {
         notifyRescuerJoin,
@@ -35,32 +38,19 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        if ("geolocation" in navigator) {
-            const fetchGeocoding = async (location) => {
-                try {
-                    const res = await ReverseGeocoding(location);
-                    return res;
-                } catch (error) {
-                    console.error("Error fetching geocoding:", error);
-                }
-            }
-
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const address = await fetchGeocoding({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                });
-
-                setLocation({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                    address: address
-                });
-            });
+        const fetchUserLocation = async () => {
+            const userLocation = await getCurrentUserLocation();
+            setLocation(userLocation);
         }
+
+        fetchUserLocation();
     }, []);
 
     useEffect(() => {
+        if (user) {
+            connectSocket();
+        }
+
         if (user && user.role === 'rescuer') {
             notifyRescuerJoin(user._id);
         }
@@ -68,7 +58,21 @@ export const UserProvider = ({ children }) => {
             setActiveItem('dashboard');
             navigate("/dashboard");
         }
+
+        return () => {
+            disconnectSocket();
+        };
     }, [user]);
+
+    useEffect(() => {
+        if (location.lat && location.lng && user) {
+            const upDateLocationToMongo = async (location) => {
+                await createOrUpdateUserLocation(location);
+            }
+
+            upDateLocationToMongo(location);
+        }
+    }, [location]);
 
     return (
         <UserContext.Provider value={{

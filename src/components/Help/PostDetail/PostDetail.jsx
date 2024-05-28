@@ -102,14 +102,18 @@ const PostDetail = () => {
 
 
 
-    const handleVote = async (event, voteType) => {
+    const handleVote = async (event, post, voteType) => {
         event.stopPropagation();
         setLoading(true);
         try {
-            const response = await vote(id, voteType);
+            const newVoteType = post.voteType === voteType ? VOTE_TYPE.none : voteType;
+            const response = await vote(id, newVoteType);
+            post.voteCount = response;
+            post.voteType = newVoteType;
             setPost((prevPost) => ({
                 ...prevPost,
                 voteCount: response,
+                voteType: newVoteType
             }));
 
         } catch (err) {
@@ -145,7 +149,9 @@ const PostDetail = () => {
                                         <div className="flex flex-col ml-2">
                                             <p className="text-lg font-bold">{post?.user?.name}</p>
                                             <div className="flex items-center">
-                                                <p className="text-sm text-gray-600">{`${post.distance}km`}</p>
+                                                <p className="text-sm text-gray-600">
+                                                    {post?.distance !== null && parseInt(post?.distance) >= 1 ? `${post.distance}km` : `${post.distance * 1000}m`}
+                                                </p>
                                                 <FontAwesomeIcon icon={faEarth} className='text-slate-500 mx-1' />
                                                 <p className="text-sm text-gray-600">{formatHHmm(post.updatedAt)}</p>
                                             </div>
@@ -165,15 +171,17 @@ const PostDetail = () => {
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center items-start ml-2">
-                                <div className="flex justify-center items-center border rounded-lg p-1 shadow-md">
-                                    <img className="border-red-500" width={30} src={post.requestTypeIcon} alt="" />
-                                    <p className="mx-1 font-bold text-red-600">{post.requestType}</p>
-                                </div>
+                                {!post.isEmergency && (
+                                    <div className="flex justify-center items-center border rounded-lg p-1 shadow-md">
+                                        <img className="border-red-500" width={30} src={post.requestTypeIcon} alt="" />
+                                        <p className="mx-1 font-bold text-red-600">{post.requestType}</p>
+                                    </div>
+                                )}
                                 <p className="text-base mt-2">{post?.content}</p>
                                 {post?.media?.length > 0 && (
                                     <div className="flex justify-start w-[1200px] flex-1 flex-wrap">
                                         {post?.media.map((media, index) => (
-                                            <Image key={index} width={300} height={200} src={media.url} alt="Post"
+                                            <Image key={index} width={300} src={media.url} alt="Post"
                                                 className="rounded-lg mt-4" loading="lazy" />
                                         ))}
                                     </div>
@@ -184,8 +192,8 @@ const PostDetail = () => {
                                 <div className="flex rounded-2xl border border-slate-300">
                                     <div className="flex justify-center items-center">
                                         <button
-                                            className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                            onClick={(event) => handleVote(event, VOTE_TYPE.upvote)}
+                                            className={`hover:rounded-2xl hover:bg-slate-200 px-2 py-1 ${post.voteType === VOTE_TYPE.upvote ? 'text-red-500' : ''}`}
+                                            onClick={(event) => handleVote(event, post, VOTE_TYPE.upvote)}
                                             disabled={loading}
                                         >
                                             <FontAwesomeIcon
@@ -198,8 +206,8 @@ const PostDetail = () => {
                                     </div>
                                     <div className="flex justify-center items-center">
                                         <button
-                                            className="hover:rounded-2xl hover:bg-slate-200 px-3 py-1"
-                                            onClick={(event) => handleVote(event, VOTE_TYPE.downvote)}
+                                            className={`hover:rounded-2xl hover:bg-slate-200 px-2 py-1 ${post.voteType === VOTE_TYPE.downvote ? 'text-red-500' : ''}`}
+                                            onClick={(event) => handleVote(event, post, VOTE_TYPE.downvote)}
                                             disabled={loading}
                                         >
                                             <FontAwesomeIcon

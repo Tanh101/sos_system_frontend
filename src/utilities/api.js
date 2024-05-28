@@ -40,7 +40,7 @@ instance.interceptors.response.use(
 
                     const { accessToken } = rs.data;
                     localStorage.setItem("accessToken", accessToken)
-
+                    
                     return instance(originalConfig);
                 } catch (_error) {
                     return Promise.reject(_error);

@@ -72,7 +72,7 @@ const Help = () => {
         if (user && user.role === 'rescuer') {
             receiveEmergencyRequest((data) => {
                 setRealTimeRequest([...realTimeRequest, data]);
-                fetchRequests();  // Thêm lời gọi fetchRequests để cập nhật lại danh sách requests
+                fetchRequests();
             });
         }
     }, [user, realTimeRequest]);
