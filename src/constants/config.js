@@ -55,6 +55,32 @@ const VOTE_TYPE = {
     "none": 2,
 }
 
+const ITEM_PER_PAGE = 10;
+const PAGE = 1;
+
+const REQUEST_STATUS = {
+    PENDING: 0,
+    RESCUING: 1,
+    RESCUED: 2,
+    REJECTED: 3
+};
+
+const USER_STATUS = {
+    ACTIVE: 1,
+    DELETED: 0
+}
+
+const USER_STATUS_TEXT = {
+    [USER_STATUS.ACTIVE]: "Active",
+    [USER_STATUS.DELETED]: "Deleted"
+}
+
+const USER_ROLE = {
+    ADMIN: "admin",
+    USER: "user",
+    RESCUER: "rescuer"
+}
+
 export {
     AppBaseUrl,
     SPACE_CHARACTER,
@@ -73,4 +99,10 @@ export {
     requestMarkerIconURL,
     searchMarkerIconURL,
     VOTE_TYPE,
+    REQUEST_STATUS,
+    USER_STATUS,
+    PAGE,
+    ITEM_PER_PAGE,
+    USER_STATUS_TEXT,
+    USER_ROLE,
 }

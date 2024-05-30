@@ -52,7 +52,12 @@
         "Đã hủy": "Cancelled",
         "Đã hoàn thành": "Completed",
         "Đã chấp nhận": "Accepted",
-        "Xem vị trí": "View location"
-
+        "Xem vị trí": "View location",
+        "Bảng điều khiển": "Dashboard",
+        "Tổng số yêu cầu": "Total requests",
+        "Tổng số người dùng": "Total users",
+        "Tổng số người cứu hộ": "Total rescuers",
+        "Tổng số yêu cầu đã hỗ trợ" : "Total requests supported",
+        "Thống kê yêu cầu": "Request statistics"
     }
 }

@@ -9,7 +9,7 @@ function AuthService() {
     const { errorProcessor } = ErrorProcessService();
 
 
-    const signup = async(email, name, password, repeatPassword, dob, phoneNumber, address) => {
+    const signup = async (email, name, password, repeatPassword, dob, phoneNumber, address) => {
         try {
             if (password !== repeatPassword) {
                 Toastify.error("Passwords do not match");
@@ -34,7 +34,7 @@ function AuthService() {
         }
     }
 
-    const login = async(email, password) => {
+    const login = async (email, password) => {
         try {
             const response = await api.post("/auth/login", {
                 email,
@@ -64,7 +64,7 @@ function AuthService() {
         }
     };
 
-    const logout = async() => {
+    const logout = async () => {
         try {
             const response = await api.post("/auth/logout");
             if (response.status === 200) {
@@ -78,7 +78,7 @@ function AuthService() {
         }
     }
 
-    const getUserProfile = async() => {
+    const getUserProfile = async () => {
         try {
             const response = await api.get("/user/profile");
             if (response.status === 200) {
@@ -90,11 +90,29 @@ function AuthService() {
         }
     }
 
+    const refreshAccessToken = async () => {
+        try {
+            const refreshToken = localStorage.getItem("refreshToken");
+            const response = await api.post("/auth/refresh", {
+                refreshToken: refreshToken,
+            });
+
+            const { accessToken } = response.data;
+            localStorage.setItem("accessToken", accessToken);
+
+            return accessToken;
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
     return {
         signup,
         login,
         logout,
         getUserProfile,
+        refreshAccessToken
     };
 }
 

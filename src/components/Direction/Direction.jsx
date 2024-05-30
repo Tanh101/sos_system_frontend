@@ -6,9 +6,10 @@ import {
     DirectionsRenderer,
     useJsApiLoader
 } from "@react-google-maps/api";
-import { EmergencyMapContainerStyle, googleMapApiKey, googleMapComponentOptions, mapLibraries } from "../../constants/config";
+import { googleMapApiKey, googleMapComponentOptions, mapLibraries } from "../../constants/config";
 
-const Direction = () => {
+const Direction = ({ origin, destination }) => {
+    console.log(origin, destination);
     const [directions, setDirections] = useState();
     const count = useRef(0);
     const { isLoaded, loadError } = useJsApiLoader({
@@ -28,7 +29,6 @@ const Direction = () => {
     ) => {
         if (status === "OK" && count.current === 0) {
             count.current++;
-            console.count();
             setDirections(result);
         }
     };
@@ -52,8 +52,8 @@ const Direction = () => {
                 >
                     <DirectionsService
                         options={{
-                            origin: "16 Ngô sĩ liên, Liên chiểu, Đà Nẵng, Việt Nam",
-                            destination: "121 Ngô Văn Sở, Liên Chiểu, Đà Nẵng, Việt Nam",
+                            origin: { lat: origin?.lat, lng: origin?.lng },
+                            destination: { lat: destination?.lat, lng: destination?.lng },
                             travelMode: "DRIVING"
                         }}
                         callback={directionsCallback}

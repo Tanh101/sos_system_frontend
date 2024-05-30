@@ -1,7 +1,7 @@
 import ErrorProcessService from "./ErrorProcessService";
 import api from "../utilities/api";
 import { Toastify } from "../toastify/Toastify";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RequestService = () => {
     const navigate = useNavigate();
@@ -24,8 +24,8 @@ const RequestService = () => {
         try {
             const res = {
                 id: item.id,
-                requestType: item.requestTypes.name,
-                requestTypeIcon: item.requestTypes.iconUrl,
+                requestType: item.requestTypes?.name,
+                requestTypeIcon: item.requestTypes?.iconUrl,
                 content: item.content,
                 address: item.address,
                 latitude: item.latitude,
@@ -37,6 +37,7 @@ const RequestService = () => {
                 user: item.users,
                 isEmergency: item.isEmergency,
                 voteCount: item.voteCount,
+                voteType: item?.votes[0]?.voteType,
                 distance: item.distance,
             }
             return res;
@@ -47,21 +48,35 @@ const RequestService = () => {
 
     const createRequest = async (data) => {
         try {
-            const media = data.avatarResponses.map(item => item);
+            let formData = {};
 
-            const response = await api.post("/requests", {
-                requestTypeId: data.requestType,
-                content: data.content,
-                latitude: data.lat,
-                longitude: data.lng,
-                address: data.address,
-                isEmergency: data.isEmergency ? 1 : 0,
-                media: media
-            });
+            if (data.isEmergency) {
+                formData = {
+                    latitude: data.lat,
+                    longitude: data.lng,
+                    address: data.address,
+                    isEmergency: data.isEmergency ? 1 : 0,
+                }
+            } else {
+                const media = data.avatarResponses.map(item => item);
+
+                formData = {
+                    requestTypeId: data.requestType,
+                    content: data.content,
+                    latitude: data.lat,
+                    longitude: data.lng,
+                    address: data.address,
+                    isEmergency: data.isEmergency ? 1 : 0,
+                    media: media
+                }
+            }
+
+            const response = await api.post("/requests", formData);
 
             if (response.status === 200) {
                 Toastify.success("Yêu cầu của bạn đã được gửi đi");
-                navigate("/help");
+                navigate(`/help/detail/${response.data.id}`);
+                
                 return response.data;
             }
         } catch (error) {
@@ -76,8 +91,8 @@ const RequestService = () => {
             return data.map((item) => {
                 return {
                     id: item.id,
-                    requestType: item.requestTypes.name,
-                    requestTypeIcon: item.requestTypes.iconUrl,
+                    requestType: item.requestTypes?.name,
+                    requestTypeIcon: item.requestTypes?.iconUrl,
                     content: item.content,
                     address: item.address,
                     latitude: item.latitude,
@@ -142,12 +157,25 @@ const RequestService = () => {
         }
     };
 
+    const isExisEmergencyRequest = async () => {
+        try {
+            const response = await api.get('/isEmergency');
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
     return {
         getRequestType,
         createRequest,
         getRequests,
         vote,
         getRequestDetail,
+        isExisEmergencyRequest
     };
 };
 

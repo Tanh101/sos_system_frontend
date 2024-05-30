@@ -2,7 +2,10 @@
 .sidebar__menu:hover .fa-message,
 .sidebar__menu:hover .fa-bell,
 .sidebar__menu:hover .fa-location-dot,
-.sidebar__menu:hover .fa-tower-broadcast {
+.sidebar__menu:hover .fa-tower-broadcast,
+.sidebar__menu:hover .fa-house,
+.sidebar__menu:hover .fa-user,
+.sidebar__menu:hover .fa-robot {
     color: #fff;
 }
 

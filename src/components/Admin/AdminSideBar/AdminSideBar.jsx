@@ -27,7 +27,6 @@ const AdminSideBar = () => {
                 {isShow && <p className='mx-4'>Menu</p>}
             </div>
             <SidebarItem isShow={isShow} link="/dashboard" icon={faHome} title="Dashboard" active={activeItem === 'dashboard'} onClick={() => handleItemClick('dashboard')} />
-            <SidebarItem isShow={isShow} link="/admin" icon={faUser} title="Account" active={activeItem === 'admin'} onClick={() => handleItemClick('admin')} />
             <SidebarItem isShow={isShow} link="/chatbot" icon={faRobot} title="Chatbot" active={activeItem === 'chatbot'} onClick={() => handleItemClick('chatbot')} />
         </div >
     )

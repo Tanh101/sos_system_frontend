@@ -3,8 +3,8 @@ import { Route, Routes } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
-import { LocaleProvider } from "../../../Context/LocaleContext/LocaleContext";
 import AuthService from "../../../services/AuthService";
+import { UserProvider } from "../../../Context/UserContext/UserContext";
 
 const Dashboard = React.lazy(() => import("../../../components/Admin/Dashboard/Dashboard"));
 const ManageChatbot = React.lazy(() => import("../../../components/Admin/ManageChatbot/ManageChatbot"));
@@ -33,18 +33,17 @@ const UserNavigation = () => {
     }, []);
 
     return (
-        <LocaleProvider>
+        <UserProvider>
             <div className="flex fixed w-full h-screen font-roboto bg-white">
                 <div className="flex bg-white flex-col flex-1">
                     <Navbar />
                     <Chatbot />
                     {user && user.role === 'admin' ? (
-                        <div className="flex bg-slate-100">
+                        <div className="flex flex-1 bg-slate-100">
                             <AdminSideBar />
                             <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
                                 <Routes>
                                     <Route path="/dashboard" element={<Dashboard />} />
-                                    <Route path="/admin" element={<Account />} />
                                     <Route path="/chatbot" element={<ManageChatbot />} />
 
                                 </Routes>
@@ -66,7 +65,7 @@ const UserNavigation = () => {
                     )}
                 </div>
             </div>
-        </LocaleProvider>
+        </UserProvider>
     );
 }
 

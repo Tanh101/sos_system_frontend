@@ -12,7 +12,6 @@ const formatHHmm = (date) => {
     return formattedTime;
 }
 
-
 export {
     formatDate,
     formatHHmm,
