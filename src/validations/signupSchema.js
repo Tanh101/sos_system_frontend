@@ -11,7 +11,7 @@ const signupSchema = yup.object({
         .string()
         .nullable()
         .transform((curr, orig) => (orig === "" ? null : curr))
-        .min(8).max(20)
+        .min(10).max(20)
         .matches(phoneRegExp, 'Phone number is invalid'),
     address: yup.string().required('Address is required').max(100).min(10, 'Address must be at least 10 characters'),
     dob: yup.date().required('Date of birth is required').max(new Date(), 'Date of birth must be in the past'),

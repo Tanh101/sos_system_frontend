@@ -76,14 +76,14 @@ const Account = () => {
     ];
 
     return (
-        <div className="flex flex-col flex-1 bg-white h-screen justify-start items-start m-5 p-5 px-10 rounded-lg">
+        <>
             <p className='font-medium text-lg'>
                 Account Management
             </p>
             <div className="flex w-full">
                 <Table className="w-full" columns={columns} dataSource={data} />
             </div>
-        </div>
+        </>
     )
 }
 

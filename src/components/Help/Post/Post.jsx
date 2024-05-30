@@ -88,7 +88,9 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
                                 <div className="flex flex-col ml-2">
                                     <p>{item.user?.name}</p>
                                     <div className="flex text-slate-400">
-                                        <p className='mr-2'>{`${item.distance}km`}</p>
+                                        <p className={`${item.distance !== null ? 'mr-2' : ''}`}>
+                                            {item?.distance !== null && (parseInt(item?.distance) >= 1) ? `${item.distance}km` : `${item.distance * 1000}m`}
+                                        </p>
                                         <p>{formatHHmm(item.updatedAt)}</p>
                                     </div>
                                 </div>
@@ -101,14 +103,19 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
                                 <p className="text-[#F73334] ml-2">{t("Khẩn cấp")}</p>
                             </div>
                         ) : null}
-                        <div className="flex justify-start mt-4 items-center w-full">
-                            <div className="flex w-auto border rounded-lg shadow-md p-1">
-                                <img className="border-red-500" width={20} src={item.requestTypeIcon} alt="" />
-                                <p className="mx-1 font-medium text-sm text-red-600">{item.requestType}</p></div>
-                        </div>
-                        <div className="flex my-2">
-                            <p>{item.content}</p>
-                        </div>
+                        {item.isEmergency === 0 ? (
+                            <>
+                                <div className="flex justify-start mt-4 items-center w-full">
+                                    <div className="flex w-auto border rounded-lg shadow-md p-1">
+                                        <img className="border-red-500" width={20} src={item.requestTypeIcon} alt="" />
+                                        <p className="mx-1 font-medium text-sm text-red-600">{item.requestType}</p></div>
+                                </div>
+                                <div className="flex my-2">
+                                    <p>{item.content}</p>
+                                </div>
+                            </>
+                        ) : null}
+
                         {item?.media?.length > 0 && (
                             <div className="grid grid-cols-3 gap-4 mt-2">
                                 {item.media.map((media, index) => (
@@ -116,6 +123,7 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
                                 ))}
                             </div>
                         )}
+
                         <div className="flex justify-between items-center mt-4">
                             <div className="flex items-center ">
                                 <div className="flex justify-center items-center rounded-2xl border border-slate-300">
@@ -153,7 +161,7 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
                                 <div className="flex justify-center items-center">
                                     <button onClick={handleResponse}>
                                         <FontAwesomeIcon
-                                            className='hover:text-blue-600 px-2 py-2 rounded-full hover:bg-blue-300 mx-2'
+                                            className='hover:text-red-600 px-2 py-2 rounded-full hover:bg-blue-300 mx-2'
                                             icon={faCheck} color="red" size="xl"
                                         />
                                     </button>
