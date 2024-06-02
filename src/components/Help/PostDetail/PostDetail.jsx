@@ -11,7 +11,7 @@ import {
     faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { Dropdown, Image } from 'antd';
@@ -25,6 +25,7 @@ import Loading from "../../Loading/Loading";
 import Direction from "../../Direction/Direction";
 import { VOTE_TYPE } from "../../../constants/config";
 import { formatHHmm } from "../../../utilities/formatDate";
+import { UserContext } from "../../../Context/UserContext/UserContext";
 
 const PostDetail = () => {
     const navigate = useNavigate();
@@ -32,22 +33,19 @@ const PostDetail = () => {
     const { t } = useTranslation();
 
     const { getRequestDetail, vote } = RequestService();
+    const { location } = useContext(UserContext);
 
     const [post, setPost] = useState(null);
     const [isOpenStreetView, setIsOpenStreetView] = useState(false);
-    const [requestPlace, setRequestPlace] = useState({});
+    const [origin, setOrigin] = useState({});
+    const [destination, setDestination] = useState({});
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState('');
 
     const handleStreetViewClick = (event, item) => {
         event.stopPropagation();
-        setRequestPlace({
-            location: {
-                lat: parseFloat(item.latitude),
-                lng: parseFloat(item.longitude),
-            },
-            info: item.address
-        });
+        setOrigin({ lat: parseFloat(item?.latitude), lng: parseFloat(item?.longitude) });
+        setDestination({ lat: location?.lat, lng: location?.lng });
         setIsOpenStreetView(true);
     }
 
@@ -296,7 +294,9 @@ const PostDetail = () => {
                                 <FontAwesomeIcon icon={faClose} size="lg" />
                             </button>
                         </div>
-                        <Direction />
+                        {origin && destination && (
+                            <Direction origin={origin} destination={destination} />
+                        )}
                     </div>
                 </Popup>
             )}

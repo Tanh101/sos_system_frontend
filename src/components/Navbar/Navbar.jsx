@@ -8,7 +8,12 @@ import Notification from '../Notification/Notification';
 import Logo from '../Logo/Logo';
 import { UserContext } from '../../Context/UserContext/UserContext';
 import { LocaleContext } from '../../Context/LocaleContext/LocaleContext';
-
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+import Badge from '@mui/material/Badge';
+import IconButton from '@mui/material/IconButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import NotificationList from '../NotificationList/NotificationList';
+import { Dropdown } from 'antd';
 const Navbar = () => {
     const { t } = useTranslation();
 
@@ -19,6 +24,7 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const notificationRef = useRef(null);
 
     const { logout } = AuthService();
 
@@ -32,10 +38,14 @@ const Navbar = () => {
 
     const handleClickOutside = (event) => {
         if (
-            dropdownRef.current &&
-            !dropdownRef.current.contains(event.target)
+            dropdownRef.current && !dropdownRef.current.contains(event.target)
         ) {
             setIsDropdownOpen(false);
+        }
+        if (
+            notificationRef.current && !notificationRef.current.contains(event.target)
+        ) {
+            setIsOpen(false);
         }
     };
 
@@ -78,9 +88,18 @@ const Navbar = () => {
                     </select>
                 </div>
                 <div className="flex flex-row relative mx-10">
-                    <div className="flex Notification" onClick={toggleNoti}>
-                        <Notification count={count} />
+                    <div className="flex Notification" onClick={toggleNoti} ref={notificationRef}>
+                        <IconButton aria-label="Notifications">
+                            <Badge badgeContent={count} color="error">
+                                <FontAwesomeIcon color='slate-400' icon={faBell} onClick={toggleNoti} />
+                            </Badge>
+                        </IconButton>
                     </div>
+                    {isOpen && (
+                        <div className="absolute top-full -right-1/4 mt-2 w-64 bg-white rounded-md shadow-lg z-50" >
+                            <NotificationList />
+                        </div>
+                    )}
                 </div>
                 <div className="profile flex flex-row relative" onClick={toggleDropdown} ref={dropdownRef}>
                     <div className="border border-[#F73334] rounded-full">

@@ -39,11 +39,11 @@ const UserNavigation = () => {
                     <Navbar />
                     <Chatbot />
                     {user && user.role === 'admin' ? (
-                        <div className="flex bg-slate-100">
+                        <div className="flex flex-1 bg-slate-100">
                             <AdminSideBar />
                             <Suspense fallback={<FontAwesomeIcon icon={faSpinner} />}>
                                 <Routes>
-                                    <Route path="/admin" element={<Dashboard />} />
+                                    <Route path="/dashboard" element={<Dashboard />} />
                                     <Route path="/chatbot" element={<ManageChatbot />} />
 
                                 </Routes>
