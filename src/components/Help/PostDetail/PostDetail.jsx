@@ -33,7 +33,7 @@ const PostDetail = () => {
     const { t } = useTranslation();
 
     const { getRequestDetail, vote } = RequestService();
-    const { location } = useContext(UserContext);
+    const { user, location } = useContext(UserContext);
 
     const [post, setPost] = useState(null);
     const [isOpenStreetView, setIsOpenStreetView] = useState(false);
@@ -51,11 +51,11 @@ const PostDetail = () => {
 
     const handleMessageClick = (event) => {
         event.stopPropagation();
-        navigate('/message');
+        navigate('/messages');
     };
 
     const items = [
-        {
+        ...(user.id === post?.userId ? [{
             key: '1',
             label: (
                 <button onClick={handleMessageClick}>
@@ -63,7 +63,7 @@ const PostDetail = () => {
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faEdit} color="red" />,
-        },
+        }] : []),
         {
             key: '2',
             label: (

@@ -39,6 +39,7 @@ const RequestService = () => {
                 voteCount: item.voteCount,
                 voteType: item?.votes[0]?.voteType,
                 distance: item.distance,
+                userId: item.userId,
             }
             return res;
         } catch (error) {
@@ -76,7 +77,7 @@ const RequestService = () => {
             if (response.status === 200) {
                 Toastify.success("Yêu cầu của bạn đã được gửi đi");
                 navigate(`/help/detail/${response.data.id}`);
-                
+
                 return response.data;
             }
         } catch (error) {
@@ -106,6 +107,7 @@ const RequestService = () => {
                     voteCount: item.voteCount,
                     voteType: item?.votes[0]?.voteType,
                     distance: item?.distance,
+                    userId: item.userId,
                 };
             });
         } catch (error) {
@@ -113,9 +115,16 @@ const RequestService = () => {
         }
     };
 
-    const getRequests = async () => {
+    const getRequests = async (requestType = null, status = null, isEmergency = null) => {
         try {
-            const response = await api.get("/requests");
+            const response = await api.get("/requests", {
+                params: {
+                    requestType,
+                    status,
+                    isEmergency,
+                },
+            });
+
             if (response.status === 200) {
                 const requests = processRequestResponse(response.data.requests);
                 const pagination = response.data.paginations;
@@ -129,6 +138,7 @@ const RequestService = () => {
             errorProcessor(error);
         }
     };
+
 
     const vote = async (id, voteType) => {
         try {
@@ -169,13 +179,27 @@ const RequestService = () => {
         }
     }
 
+    const updateRequestStatus = async (id, status) => {
+        try {
+            const response = await api.put(`/requests/${id}?status=${status}`);
+
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
     return {
         getRequestType,
         createRequest,
         getRequests,
         vote,
         getRequestDetail,
-        isExisEmergencyRequest
+        isExisEmergencyRequest,
+        updateRequestStatus
     };
 };
 

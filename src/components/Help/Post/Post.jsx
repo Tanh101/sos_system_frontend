@@ -19,7 +19,7 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { vote } = RequestService();
-    const { user, sendResponseToClient } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     const [loading, setLoading] = useState(false);
 
@@ -49,7 +49,6 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
         const clientId = realTimeRequest[0]?.clientId;
         event.stopPropagation();
         const responseData = { clientId, message: 'Rescue on the way!' };
-        sendResponseToClient(responseData);
     };
 
     const handlePostClick = (item) => {

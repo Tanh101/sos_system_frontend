@@ -18,7 +18,7 @@ const Navbar = () => {
     const { t } = useTranslation();
 
     const { handleChangeLanguage, currentLanguage } = useContext(LocaleContext);
-    const { user, receiveEmergencyRequest, receiveResponseFromRescuer } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     const [count, setCount] = useState(1);
     const [isOpen, setIsOpen] = useState(false);
@@ -63,14 +63,9 @@ const Navbar = () => {
 
     useEffect(() => {
         if (user && user.role === 'rescuer') {
-            receiveEmergencyRequest((data) => {
-                setCount(prevCount => prevCount + 1);
-            });
+            //setCount for notification
         } else if (user && user.role === 'user') {
-            receiveResponseFromRescuer((data) => {
-                console.log('Response from rescuer:', data);
-                setCount(prevCount => prevCount + 1);
-            });
+            //set count for notification
         }
     }, [user]);
 

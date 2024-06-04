@@ -20,7 +20,7 @@ const Help = () => {
 
     const { getRequests, getRequestType } = RequestService();
 
-    const { user, setActiveItem, receiveEmergencyRequest } = useContext(UserContext);
+    const { user, setActiveItem } = useContext(UserContext);
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
@@ -70,10 +70,7 @@ const Help = () => {
 
     useEffect(() => {
         if (user && user.role === 'rescuer') {
-            receiveEmergencyRequest((data) => {
-                setRealTimeRequest([...realTimeRequest, data]);
-                fetchRequests();
-            });
+            
         }
     }, [user, realTimeRequest]);
 
