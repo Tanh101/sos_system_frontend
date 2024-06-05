@@ -9,11 +9,10 @@ import {
     searchMarkerIconURL
 } from "../../constants/config";
 
-const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace, searchLocation }) => {
-    const [selected, setSelected] = useState(null);
+const PlaceInfo = ({ selected, setSelected, userPlace, rescuerPlaces, requestPlace, searchLocation }) => {
     return (
         <>
-            {rescuerPlaces.map((marker) => (
+            {rescuerPlaces?.length > 0 && rescuerPlaces.map((marker) => (
                 <Marker
                     key={`${marker.location.lat * marker.location.lng}`}
                     position={{
@@ -66,7 +65,7 @@ const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace, searchLocation }) =
                 />
             )}
 
-            {searchLocation.location.lat && (
+            {searchLocation && searchLocation?.location?.lat && (
                 <Marker
                     position={{
                         lat: searchLocation.location.lat,
@@ -82,9 +81,6 @@ const PlaceInfo = ({ userPlace, rescuerPlaces, requestPlace, searchLocation }) =
                     }}
                 />
             )}
-
-
-
             {selected ? (
                 <InfoWindow
                     position={{

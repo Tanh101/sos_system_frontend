@@ -8,6 +8,7 @@ import { REQUEST_STATUS } from '../../constants/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEmergencyRequest } from '../../redux/action/emergencyAction';
 import socketInstance, { socket } from '../../utilities/socketInstance';
+import { getDistance } from '../../utilities/distance';
 
 export const UserContext = createContext();
 
@@ -16,8 +17,10 @@ export const UserProvider = ({ children }) => {
     const dispatch = useDispatch();
 
     const emergencyRequests = useSelector(state => state.emergecy.emergencyRequests);
+    const notifications = useSelector(state => state.notify.notifications);
+
     const { getCurrentUserLocation, createOrUpdateUserLocation } = LocationService();
-    const { getRequestOwner } = RequestService();
+    const { getRequestIsTracking } = RequestService();
     const { getUserProfile } = AuthService();
 
     const { connectSocket, disconnectSocket, emitWithToken } = socketInstance();
@@ -35,7 +38,7 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const getEmergencyReq = async () => {
-            const response = await getRequestOwner(null, REQUEST_STATUS.PENDING, 1);
+            const response = await getRequestIsTracking();
             dispatch(fetchEmergencyRequest(response?.requests))
         }
 
@@ -61,10 +64,6 @@ export const UserProvider = ({ children }) => {
         if (user) {
             connectSocket();
         }
-
-        if (user && user.role === 'rescuer') {
-
-        }
         if (user && user.role === 'admin') {
             setActiveItem('dashboard');
             navigate("/dashboard");
@@ -87,10 +86,15 @@ export const UserProvider = ({ children }) => {
 
         if (location.lat && location.lng && user.role === 'rescuer') {
             rescuerIntervalRef.current = setInterval(async () => {
+                let distance = 0;
                 const response = await getCurrentUserLocation();
-                upDateLocationToMongo(response);
-                console.log("Rescuer location updated");
-            }, 5000);
+                distance = getDistance(location, response);
+                if (distance > 10) {
+                    upDateLocationToMongo(response);
+                    setLocation(response);
+                    console.log("Rescuer location updated");
+                }
+            }, 2000);
         }
 
         return () => {
@@ -109,15 +113,24 @@ export const UserProvider = ({ children }) => {
             });
 
             socket.on("locationSharingStarted", (data) => {
+                if (intervalRef.current) {
+                    clearInterval(intervalRef.current);
+                }
+
                 intervalRef.current = setInterval(async () => {
                     const response = await getCurrentUserLocation();
-                    emitWithToken("updateLocation", {
-                        requestId: emergencyRequests[0].id,
-                        latitude: response.lat,
-                        longitude: response.lng,
-                    });
-                }, 5000);
-                console.log("Location sharing started with requestId:", emergencyRequests[0].id);
+                    const distance = getDistance(location, response);
+                    if (distance > 10) {
+                        setLocation(response);
+                        emitWithToken("updateLocation", {
+                            requestId: emergencyRequests[0].id,
+                            latitude: response.lat,
+                            longitude: response.lng,
+                        });
+                        console.log("user Location updated");
+                    }
+
+                }, 2000);
             });
 
         } else {
@@ -130,7 +143,6 @@ export const UserProvider = ({ children }) => {
             }
         };
     }, [emergencyRequests, location]);
-
 
     return (
         <UserContext.Provider value={{

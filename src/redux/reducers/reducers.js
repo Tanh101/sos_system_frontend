@@ -1,10 +1,13 @@
 import { combineReducers } from 'redux';
-import { ADD_EMERGENCY_REQUEST, REMOVE_EMERGENCY_REQUEST, FETCH_EMERGENCY_REAQUEST } from '../../constants/config';
+import { ADD_EMERGENCY_REQUEST, REMOVE_EMERGENCY_REQUEST, FETCH_EMERGENCY_REAQUEST, GET_NOTIFICATION } from '../../constants/config';
 
 const initialState = {
     emergencyRequests: []
 };
 
+const initialNotiState = {
+    notifications: []
+}
 const emergencyReducer = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_EMERGENCY_REAQUEST:
@@ -27,9 +30,21 @@ const emergencyReducer = (state = initialState, action) => {
     }
 };
 
+const notificationReducer = (state = initialNotiState, action) => {
+    switch (action.type) {
+        case GET_NOTIFICATION:
+            return {
+                ...state,
+                notifications: action.payload
+            };
+        default:
+            return state;
+    }
+}
 
 const rootReducer = combineReducers({
     emergecy: emergencyReducer,
+    notify: notificationReducer,
 });
 
 export default rootReducer;

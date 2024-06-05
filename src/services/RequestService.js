@@ -40,6 +40,7 @@ const RequestService = () => {
                 voteType: item?.votes[0]?.voteType,
                 distance: item.distance,
                 userId: item.userId,
+                rescuerId: item.rescuerId
             }
             return res;
         } catch (error) {
@@ -108,6 +109,7 @@ const RequestService = () => {
                     voteType: item?.votes[0]?.voteType,
                     distance: item?.distance,
                     userId: item.userId,
+                    rescuerId: item.rescuerId,
                 };
             });
         } catch (error) {
@@ -216,6 +218,63 @@ const RequestService = () => {
         }
     }
 
+    const getRequestIsTracking = async () => {
+        try {
+            const response = await api.get("/requests/active");
+            if (response.status === 200) {
+                const requests = processRequestResponse(response.data.requests);
+                const pagination = response.data.paginations;
+                return {
+                    requests,
+                    pagination,
+                };
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
+    const getRescuerRequest = async (status = null) => {
+        try {
+            const response = await api.get("/requests/rescuer", {
+                params: {
+                    status
+                }
+            });
+
+            if (response.status === 200) {
+                const requests = processRequestResponse(response.data.requests);
+                const pagination = response.data.paginations;
+                return {
+                    requests,
+                    pagination,
+                };
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
+    const getDangerRequest = async () => {
+        try {
+            const response = await api.get("/danger/request");
+            if (response.status === 200) {
+                const requests = processRequestResponse(response.data.requests);
+                const pagination = response.data.paginations;
+                return {
+                    requests,
+                    pagination,
+                };
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
+
     return {
         getRequestType,
         createRequest,
@@ -225,6 +284,9 @@ const RequestService = () => {
         isExisEmergencyRequest,
         updateRequestStatus,
         getRequestOwner,
+        getRequestIsTracking,
+        getRescuerRequest,
+        getDangerRequest,
     };
 };
 

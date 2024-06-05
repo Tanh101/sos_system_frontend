@@ -108,7 +108,6 @@ const Ring = () => {
                     contentStyle={{ borderRadius: '10px' }}
                 >
                     <div>
-                        <h2>{t("Emergency Request Form")}</h2>
                         <FormRequest isEmergency={true} />
                     </div>
                 </Popup>

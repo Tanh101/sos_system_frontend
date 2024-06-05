@@ -12,13 +12,14 @@ import { Toastify } from '../../../toastify/Toastify';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../../Context/UserContext/UserContext';
 import FormRequest from '../../Emergency/FormRequest/FormRequest';
-import { VOTE_TYPE } from '../../../constants/config';
+import { REQUEST_STATUS, VOTE_TYPE } from '../../../constants/config';
 import { formatHHmm } from '../../../utilities/formatDate';
+import Status from '../../Status/Status';
 
-const Post = ({ requests, setRequests, realTimeRequest }) => {
+const Post = ({ requests, setRequests }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { vote } = RequestService();
+    const { vote, updateRequestStatus } = RequestService();
     const { user } = useContext(UserContext);
 
     const [loading, setLoading] = useState(false);
@@ -45,10 +46,9 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
         }
     };
 
-    const handleResponse = (event) => {
-        const clientId = realTimeRequest[0]?.clientId;
+    const handleResponse = async (event, item, status) => {
         event.stopPropagation();
-        const responseData = { clientId, message: 'Rescue on the way!' };
+        const updatedRequest = await updateRequestStatus(item.id, status);
     };
 
     const handlePostClick = (item) => {
@@ -57,25 +57,7 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
 
     return (
         <div className='flex flex-col'>
-            <div className="flex justify-between mx-5 sticky top-0 bg-white">
-                <div className="flex justify-center items-center w-96 px-2 py-2 border outline-none focus:border-red-600 rounded-xl">
-                    <FontAwesomeIcon icon={faSearch} color='red' size='lg' />
-                    <input className="outline-none w-full ml-2"
-                        type="text"
-                        placeholder={t("Tìm kiếm yêu cầu...")}
-                        onChange={(e) => setSearch(e.target.value)} />
-                </div>
-                <div className="flex justify-center items-center">
-                    <Popup
-                        trigger={<button className="p-2 bg-red-600 text-white rounded-2xl">{t("Tạo yêu cầu")}</button>}
-                        modal
-                        nested
-                        contentStyle={{ borderRadius: '10px' }}
-                    >
-                        <FormRequest isEmergency={false} />
-                    </Popup>
-                </div>
-            </div>
+            
             {requests?.requests?.length > 0 && requests.requests.map((item, index) => (
                 <div key={index}
                     className="flex flex-col bg-white hover:bg-slate-50 rounded-xl mx-5 mt-1 py-1 w-auto cursor-pointer"
@@ -94,7 +76,9 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex"></div>
+                            <div className="flex justify-center items-start">
+                                <Status status={item?.status} />
+                            </div>
                         </div>
                         {item.isEmergency ? (
                             <div className="flex justify-start items-center mt-4">
@@ -158,13 +142,13 @@ const Post = ({ requests, setRequests, realTimeRequest }) => {
                             </div>
                             {user?.role === 'rescuer' && item.status === 0 && (
                                 <div className="flex justify-center items-center">
-                                    <button onClick={handleResponse}>
+                                    <button onClick={(event) => handleResponse(event, item, REQUEST_STATUS.RESCUING)}>
                                         <FontAwesomeIcon
                                             className='hover:text-red-600 px-2 py-2 rounded-full hover:bg-blue-300 mx-2'
                                             icon={faCheck} color="red" size="xl"
                                         />
                                     </button>
-                                    <button>
+                                    <button onClick={(event) => handleResponse(event, item, REQUEST_STATUS.REJECTED)}>
                                         <FontAwesomeIcon
                                             className='hover:text-black px-3 py-2 rounded-full hover:bg-slate-300'
                                             icon={faRemove} color="red" size="xl"

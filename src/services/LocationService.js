@@ -1,23 +1,23 @@
-import ErrorProcessService from "./ErrorProcessService";
-import api from "../utilities/api";
-import GoogleMapService from "./GoogleMapService";
+import ErrorProcessService from "/src/services/ErrorProcessService.js";
+import api from "/src/utilities/api.js";
+import GoogleMapService from "/src/services/GoogleMapService.js";
 
 const LocationService = () => {
     const { ReverseGeocoding } = GoogleMapService();
     const { errorProcessor } = ErrorProcessService();
 
     const getCurrentUserLocation = async () => {
-        if ("geolocation" in navigator) {
-            const fetchGeocoding = async (location) => {
-                try {
-                    const res = await ReverseGeocoding(location);
-                    return res;
-                } catch (error) {
-                    console.error("Error fetching geocoding:", error);
-                }
+        const fetchGeocoding = async (location) => {
+            try {
+                const res = await ReverseGeocoding(location);
+                return res;
+            } catch (error) {
+                console.error("Error fetching geocoding:", error);
             }
+        };
 
-            const positionPromise = new Promise((resolve, reject) => {
+        try {
+            const position = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(
                     async (position) => {
                         const address = await fetchGeocoding({
@@ -36,10 +36,12 @@ const LocationService = () => {
                     }
                 );
             });
-            return positionPromise;
+            return position;
+        } catch (error) {
+            console.error("Error getting current user location:", error);
+            return null;
         }
-        return null;
-    }
+    };
 
     const createOrUpdateUserLocation = async (location) => {
         try {
@@ -47,11 +49,10 @@ const LocationService = () => {
                 latitude: location.lat,
                 longitude: location.lng
             });
-
         } catch (error) {
             errorProcessor(error);
         }
-    }
+    };
 
     return {
         getCurrentUserLocation,

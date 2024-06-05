@@ -18,6 +18,7 @@ const Location = React.lazy(() => import("../../../components/Location/Location"
 const Inbox = React.lazy(() => import("../../../components/Inbox/Inbox"));
 const Chatbot = React.lazy(() => import("../../../components/Chatbot/Chatbot"));
 const Profile = React.lazy(() => import("../../../components/Profile/Profile"));
+const Rescue = React.lazy(() => import("../../../components/Rescuer/Rescue/Rescue"));
 
 const UserNavigation = () => {
     const { getUserProfile } = AuthService();
@@ -58,6 +59,7 @@ const UserNavigation = () => {
                                     <Route path="/location" element={<Location />} />
                                     <Route path="/messages" element={<Inbox />} />
                                     <Route path="/profile/*" element={<Profile />} />
+                                    <Route path="/rescue/*" element={<Rescue />} />
                                     <Route path="/" element={<Home />} />
                                 </Routes>
                             </Suspense>

@@ -66,6 +66,16 @@
         "Nếu chọn đồng ý hệ thống sẽ thay đổi trạng thái của bạn thành": "If you choose to agree, the system will change your status to",
         "Bạn đang gặp nguy hiểm? Hãy ấn nút bên dưới.": "Are you in danger? Press the button below.",
         "Chúng tôi sẽ liên lạc với bạn ngay lập tức.": "We will contact you immediately.",
-        "yÊU CẦU KHẨN CẤP": "EMERGENCY REQUEST"
+        "yÊU CẦU KHẨN CẤP": "EMERGENCY REQUEST",
+        "Trở về": "Back",
+        "Theo dõi cứu hộ (B) và người bị nạn (A)": "Track rescue (B) and victim (A)",
+        "Thông tin địa chỉ": "Address information",
+        "Cứu hộ": "Rescue",
+        "Định vị": "Locate",
+        "Tin nhắn": "Message",
+        "Trợ giúp": "Help",
+        "Thống kê": "Statistics",
+        "Quản lý yêu cầu": "Request management",
+        "Quản lý cảnh báo": "Danger area management"
     }
 }
