@@ -11,7 +11,7 @@ import {
     faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { Dropdown, Image } from 'antd';
@@ -23,17 +23,21 @@ import RequestService from "../../../services/RequestService";
 import { Toastify } from "../../../toastify/Toastify";
 import Loading from "../../Loading/Loading";
 import Direction from "../../Direction/Direction";
-import { VOTE_TYPE } from "../../../constants/config";
+import { USER_ROLE, VOTE_TYPE } from "../../../constants/config";
 import { formatHHmm } from "../../../utilities/formatDate";
 import { UserContext } from "../../../Context/UserContext/UserContext";
+import socketInstance, { socket } from '../../../utilities/socketInstance';
 
 const PostDetail = () => {
     const navigate = useNavigate();
+    const { emitWithToken } = socketInstance();
+
     const { id } = useParams();
     const { t } = useTranslation();
 
     const { getRequestDetail, vote } = RequestService();
-    const { user, location } = useContext(UserContext);
+
+    const { user } = useContext(UserContext);
 
     const [post, setPost] = useState(null);
     const [isOpenStreetView, setIsOpenStreetView] = useState(false);
@@ -42,10 +46,50 @@ const PostDetail = () => {
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState('');
 
+    const intervalRef = useRef(null);
+    const rescuerIntervalRef = useRef(null);
+
+    useEffect(() => {
+        if (post && socket) {
+            const requestId = post.id;
+
+            const joinRoomAndListen = () => {
+                emitWithToken('joinRequestRoom', { requestId: requestId });
+
+                socket.on('locationUpdate', (data) => {
+                    const location = {
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude)
+                    }
+                    setOrigin(location);
+                });
+
+                socket.on("rescuerLocationUpdated", (data) => {
+                    const location = {
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude)
+                    }
+                    setDestination(location);
+                });
+
+                console.log(`Joined room with requestId: ${requestId}`);
+            };
+
+            intervalRef.current = setInterval(() => {
+                joinRoomAndListen();
+            }, 5000);
+        }
+
+        return () => {
+            clearInterval(intervalRef.current);
+            socket.off('locationUpdate');
+            socket.off('rescuerLocationUpdated');
+        };
+    }, [post]);
+
     const handleStreetViewClick = (event, item) => {
         event.stopPropagation();
-        setOrigin({ lat: parseFloat(item?.latitude), lng: parseFloat(item?.longitude) });
-        setDestination({ lat: location?.lat, lng: location?.lng });
+        setDestination({ lat: parseFloat(item?.latitude), lng: parseFloat(item?.longitude) });
         setIsOpenStreetView(true);
     }
 
@@ -53,6 +97,9 @@ const PostDetail = () => {
         event.stopPropagation();
         navigate('/messages');
     };
+
+    console.log('origin updated', origin);
+    console.log('destination updated', destination);
 
     const items = [
         ...(user.id === post?.userId ? [{
@@ -294,8 +341,11 @@ const PostDetail = () => {
                                 <FontAwesomeIcon icon={faClose} size="lg" />
                             </button>
                         </div>
-                        {origin && destination && (
+                        {origin.lat && origin.lng && destination.lat && destination.lng ? (
                             <Direction origin={origin} destination={destination} />
+                        ) : (
+                            <Loading />
+
                         )}
                     </div>
                 </Popup>

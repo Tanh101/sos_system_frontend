@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
 
     const emergencyRequests = useSelector(state => state.emergecy.emergencyRequests);
     const { getCurrentUserLocation, createOrUpdateUserLocation } = LocationService();
-    const { getRequests } = RequestService();
+    const { getRequestOwner } = RequestService();
     const { getUserProfile } = AuthService();
 
     const { connectSocket, disconnectSocket, emitWithToken } = socketInstance();
@@ -26,10 +26,16 @@ export const UserProvider = ({ children }) => {
     const [activeItem, setActiveItem] = useState('home');
     const [location, setLocation] = useState({ lat: null, lng: null, address: null });
     const intervalRef = useRef(null);
+    const rescuerIntervalRef = useRef(null);
+
+    const fetchUserLocation = async () => {
+        const userLocation = await getCurrentUserLocation();
+        setLocation(userLocation);
+    }
 
     useEffect(() => {
         const getEmergencyReq = async () => {
-            const response = await getRequests(null, REQUEST_STATUS.PENDING, 1);
+            const response = await getRequestOwner(null, REQUEST_STATUS.PENDING, 1);
             dispatch(fetchEmergencyRequest(response?.requests))
         }
 
@@ -47,13 +53,7 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        const fetchUserLocation = async () => {
-            const userLocation = await getCurrentUserLocation();
-            setLocation(userLocation);
-        }
-
         fetchUserLocation();
-        console.log(location);
     }, []);
 
 
@@ -63,7 +63,7 @@ export const UserProvider = ({ children }) => {
         }
 
         if (user && user.role === 'rescuer') {
-            notifyRescuerJoin(user._id);
+
         }
         if (user && user.role === 'admin') {
             setActiveItem('dashboard');
@@ -75,18 +75,33 @@ export const UserProvider = ({ children }) => {
         };
     }, [user]);
 
-    useEffect(() => {
-        if (location.lat && location.lng && user) {
-            const upDateLocationToMongo = async (location) => {
-                await createOrUpdateUserLocation(location);
-            }
 
+    const upDateLocationToMongo = async (location) => {
+        await createOrUpdateUserLocation(location);
+    }
+
+    useEffect(() => {
+        if (location.lat && location.lng && user.role === 'user') {
             upDateLocationToMongo(location);
         }
-    }, [location]);
+
+        if (location.lat && location.lng && user.role === 'rescuer') {
+            rescuerIntervalRef.current = setInterval(async () => {
+                const response = await getCurrentUserLocation();
+                upDateLocationToMongo(response);
+                console.log("Rescuer location updated");
+            }, 5000);
+        }
+
+        return () => {
+            if (rescuerIntervalRef.current) {
+                clearInterval(rescuerIntervalRef.current);
+            }
+        };
+    }, [location, user]);
 
     useEffect(() => {
-        if (emergencyRequests.length > 0 && socket && location.lat && location.lng) {
+        if (emergencyRequests.length > 0 && socket && location.lat && location.lng && user.id === emergencyRequests[0].userId) {
             emitWithToken("startSharingLocation", {
                 requestId: emergencyRequests[0].id,
                 latitude: location.lat,
@@ -101,7 +116,6 @@ export const UserProvider = ({ children }) => {
                         latitude: response.lat,
                         longitude: response.lng,
                     });
-                    console.log("Location updated");
                 }, 5000);
                 console.log("Location sharing started with requestId:", emergencyRequests[0].id);
             });
@@ -109,6 +123,12 @@ export const UserProvider = ({ children }) => {
         } else {
             clearInterval(intervalRef.current);
         }
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
     }, [emergencyRequests, location]);
 
 

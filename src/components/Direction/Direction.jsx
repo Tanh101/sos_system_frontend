@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
     GoogleMap,
@@ -9,9 +9,10 @@ import {
 import { googleMapApiKey, googleMapComponentOptions, mapLibraries } from "../../constants/config";
 
 const Direction = ({ origin, destination }) => {
-    console.log(origin, destination);
+    const directionsService = new DirectionsService();
+
     const [directions, setDirections] = useState();
-    const count = useRef(0);
+
     const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: googleMapApiKey,
         libraries: mapLibraries
@@ -23,15 +24,32 @@ const Direction = ({ origin, destination }) => {
         mapRef.current = map;
     }, []);
 
-    const directionsCallback = (
-        result,
-        status
-    ) => {
-        if (status === "OK" && count.current === 0) {
-            count.current++;
+    const directionsCallback = useCallback((result, status) => {
+        if (status === "OK") {
             setDirections(result);
         }
-    };
+    }, [setDirections]);
+
+    const getDirections = useMemo(() => {
+        return (origin, destination) => {
+            directionsService.route({
+                origin: { lat: origin?.lat, lng: origin?.lng },
+                destination: { lat: destination?.lat, lng: destination?.lng },
+                travelMode: "DRIVING"
+            }, (result, status) => {
+                if (status === "OK") {
+                    setDirections(result);
+                }
+            });
+        };
+    }, [origin, destination]);
+
+    useEffect(() => {
+        if (isLoaded && origin.lat && origin.lng && destination.lat && destination.lng)
+            getDirections(origin, destination);
+    }, [origin, destination]);
+
+
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
 

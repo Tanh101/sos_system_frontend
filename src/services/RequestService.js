@@ -192,6 +192,30 @@ const RequestService = () => {
         }
     }
 
+    const getRequestOwner = async (requestType = null, status = null, isEmergency = null) => {
+        try {
+            const response = await api.get("/requests/me", {
+                params: {
+                    requestType,
+                    status,
+                    isEmergency,
+                },
+            });
+
+            if (response.status === 200) {
+                const requests = processRequestResponse(response.data.requests);
+                const pagination = response.data.paginations;
+                return {
+                    requests,
+                    pagination,
+                };
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
     return {
         getRequestType,
         createRequest,
@@ -199,7 +223,8 @@ const RequestService = () => {
         vote,
         getRequestDetail,
         isExisEmergencyRequest,
-        updateRequestStatus
+        updateRequestStatus,
+        getRequestOwner,
     };
 };
 
