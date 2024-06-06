@@ -58,6 +58,24 @@
         "Tổng số người dùng": "Total users",
         "Tổng số người cứu hộ": "Total rescuers",
         "Tổng số yêu cầu đã hỗ trợ" : "Total requests supported",
-        "Thống kê yêu cầu": "Request statistics"
+        "Thống kê yêu cầu": "Request statistics",
+        "Xác nhận bạn đã được cứu hộ thành công": "Confirm you have been successfully rescued",
+        "Bạn đang có một hỗ trợ khẩn cấp trong hệ thống." : "You have an emergency support in the system.",
+        "Đồng ý": "Agree",
+        "Từ chối": "Refuse",
+        "Nếu chọn đồng ý hệ thống sẽ thay đổi trạng thái của bạn thành": "If you choose to agree, the system will change your status to",
+        "Bạn đang gặp nguy hiểm? Hãy ấn nút bên dưới.": "Are you in danger? Press the button below.",
+        "Chúng tôi sẽ liên lạc với bạn ngay lập tức.": "We will contact you immediately.",
+        "yÊU CẦU KHẨN CẤP": "EMERGENCY REQUEST",
+        "Trở về": "Back",
+        "Theo dõi cứu hộ (B) và người bị nạn (A)": "Track rescue (B) and victim (A)",
+        "Thông tin địa chỉ": "Address information",
+        "Cứu hộ": "Rescue",
+        "Định vị": "Locate",
+        "Tin nhắn": "Message",
+        "Trợ giúp": "Help",
+        "Thống kê": "Statistics",
+        "Quản lý yêu cầu": "Request management",
+        "Quản lý cảnh báo": "Danger area management"
     }
 }

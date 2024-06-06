@@ -8,6 +8,7 @@ import Post from "../Help/Post/Post";
 import RequestService from "../../services/RequestService";
 import { UserContext } from "../../Context/UserContext/UserContext";
 import { t } from "i18next";
+import { REQUEST_STATUS } from "../../constants/config";
 
 const Profile = () => {
     const [activeMenu, setActiveMenu] = useState('');
@@ -25,7 +26,7 @@ const Profile = () => {
 
     const fetchRequests = async () => {
         try {
-            const requestsData = await getRequests();
+            const requestsData = await getRequests(REQUEST_STATUS.ALL);
             setRequests(requestsData);
         } catch (error) {
             console.error("Failed to fetch requests:", error);

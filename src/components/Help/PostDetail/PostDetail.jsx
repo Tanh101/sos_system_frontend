@@ -11,7 +11,7 @@ import {
     faPaperPlane,
 } from "@fortawesome/free-solid-svg-icons";
 import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { Dropdown, Image } from 'antd';
@@ -23,17 +23,22 @@ import RequestService from "../../../services/RequestService";
 import { Toastify } from "../../../toastify/Toastify";
 import Loading from "../../Loading/Loading";
 import Direction from "../../Direction/Direction";
-import { VOTE_TYPE } from "../../../constants/config";
+import { REQUEST_STATUS, VOTE_TYPE } from "../../../constants/config";
 import { formatHHmm } from "../../../utilities/formatDate";
 import { UserContext } from "../../../Context/UserContext/UserContext";
+import socketInstance, { socket } from '../../../utilities/socketInstance';
+import Status from "../../Status/Status";
 
 const PostDetail = () => {
     const navigate = useNavigate();
+    const { emitWithToken } = socketInstance();
+
     const { id } = useParams();
     const { t } = useTranslation();
 
     const { getRequestDetail, vote } = RequestService();
-    const { location } = useContext(UserContext);
+
+    const { user, location } = useContext(UserContext);
 
     const [post, setPost] = useState(null);
     const [isOpenStreetView, setIsOpenStreetView] = useState(false);
@@ -42,20 +47,74 @@ const PostDetail = () => {
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState('');
 
+    const intervalRef = useRef(null);
+
+    useEffect(() => {
+        if (post) {
+            setOrigin({
+                lat: parseFloat(post.latitude),
+                lng: parseFloat(post.longitude)
+            });
+        }
+    }, [post]);
+
+    useEffect(() => {
+        if (post && socket) {
+            const requestId = post.id;
+            const rescuerId = post.rescuerId;
+
+            const joinRoomAndListen = () => {
+                emitWithToken('joinRequestRoom', { requestId: requestId });
+
+                socket.on('locationUpdate', (data) => {
+                    const location = {
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude)
+                    };
+
+                    setOrigin(location);
+                });
+
+                if (rescuerId && post.status !== REQUEST_STATUS.PENDING &&
+                    post?.status !== REQUEST_STATUS.REJECTED) {
+                    emitWithToken("getRescuerLocation", { rescuerId: rescuerId });
+                    socket.on('returnRescuerLocation', (data) => {
+                        const location = {
+                            lat: parseFloat(data.latitude),
+                            lng: parseFloat(data.longitude)
+                        };
+
+                        setDestination(location);
+                    });
+                }
+            };
+
+            joinRoomAndListen();
+
+            intervalRef.current = setInterval(() => {
+                joinRoomAndListen();
+            }, 5000);
+        }
+
+        return () => {
+            clearInterval(intervalRef.current);
+            socket.off('locationUpdate');
+            socket.off('returnRescuerLocation');
+        };
+    }, [post, socket]);
+
     const handleStreetViewClick = (event, item) => {
         event.stopPropagation();
-        setOrigin({ lat: parseFloat(item?.latitude), lng: parseFloat(item?.longitude) });
-        setDestination({ lat: location?.lat, lng: location?.lng });
         setIsOpenStreetView(true);
     }
 
     const handleMessageClick = (event) => {
         event.stopPropagation();
-        navigate('/message');
+        navigate('/messages');
     };
 
     const items = [
-        {
+        ...(user.id === post?.userId ? [{
             key: '1',
             label: (
                 <button onClick={handleMessageClick}>
@@ -63,7 +122,7 @@ const PostDetail = () => {
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faEdit} color="red" />,
-        },
+        }] : []),
         {
             key: '2',
             label: (
@@ -81,7 +140,7 @@ const PostDetail = () => {
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faLocationDot} color="red" />,
-        }
+        },
     ];
 
 
@@ -97,8 +156,6 @@ const PostDetail = () => {
 
         fetchPostDetails();
     }, []);
-
-
 
     const handleVote = async (event, post, voteType) => {
         event.stopPropagation();
@@ -142,17 +199,22 @@ const PostDetail = () => {
                         <div className="flex flex-col overflow-y-auto h-screen">
                             <div className="flex flex-col my-2">
                                 <div className="flex justify-between items-center">
-                                    <div className="flex justify-center items-center">
-                                        <img src={avatar} alt="User Avatar" className="w-10 h-10 rounded-full" />
-                                        <div className="flex flex-col ml-2">
-                                            <p className="text-lg font-bold">{post?.user?.name}</p>
-                                            <div className="flex items-center">
-                                                <p className="text-sm text-gray-600">
-                                                    {post?.distance !== null && parseInt(post?.distance) >= 1 ? `${post.distance}km` : `${post.distance * 1000}m`}
-                                                </p>
-                                                <FontAwesomeIcon icon={faEarth} className='text-slate-500 mx-1' />
-                                                <p className="text-sm text-gray-600">{formatHHmm(post.updatedAt)}</p>
+                                    <div className="flex">
+                                        <div className="flex justify-center items-center">
+                                            <img src={post?.user?.avatar ? post?.user?.avatar : avatar} alt="User Avatar" className="w-10 h-10 rounded-full" loading="lazy" />
+                                            <div className="flex flex-col ml-2">
+                                                <p className="text-lg font-bold">{post?.user?.name}</p>
+                                                <div className="flex items-center">
+                                                    <p className="text-sm text-gray-600">
+                                                        {post?.distance !== null && parseInt(post?.distance) >= 1 ? `${post.distance}km` : `${post.distance * 1000}m`}
+                                                    </p>
+                                                    <FontAwesomeIcon icon={faEarth} className='text-slate-500 mx-1' />
+                                                    <p className="text-sm text-gray-600">{formatHHmm(post.updatedAt)}</p>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div className="flex justify-center items-center mx-10">
+                                            <Status status={post?.status} />
                                         </div>
                                     </div>
                                     <div className="flex">
@@ -279,27 +341,37 @@ const PostDetail = () => {
                     <Loading />
                 )
             }
-            {isOpenStreetView && (
-                <Popup
-                    open={isOpenStreetView}
-                    onClose={() => setIsOpenStreetView(false)}
-                    modal
-                    nested
-                    contentStyle={{ borderRadius: '10px', width: '80%', height: '60%' }}
-                >
-                    <div className="flex flex-col items-center px-10">
-                        <div className="flex justify-between items-center w-full">
-                            <p>{t("Thông tin địa chỉ")}</p>
-                            <button onClick={() => setIsOpenStreetView(false)} className="self-end px-4 py-2 text-red-600 hover:text-red-800">
-                                <FontAwesomeIcon icon={faClose} size="lg" />
-                            </button>
+            {
+                isOpenStreetView && (
+                    <Popup
+                        open={isOpenStreetView}
+                        onClose={() => setIsOpenStreetView(false)}
+                        modal
+                        nested
+                        contentStyle={{ borderRadius: '10px', width: '80%', height: '70%' }}
+                    >
+                        <div className="flex flex-1 flex-col items-center px-10">
+                            <div className="flex justify-between items-center w-full mb-2">
+                                <p className="font-bold text-red-600 text-xl">{t("Thông tin địa chỉ")}</p>
+                                <button onClick={() => setIsOpenStreetView(false)} className="self-end px-4 py-2 text-red-600 hover:text-red-800">
+                                    <FontAwesomeIcon icon={faClose} size="lg" />
+                                </button>
+                            </div>
+                            {origin.lat && origin.lng && destination.lat && destination.lng ? (
+                                <div className="flex flex-1 w-full flex-col">
+                                    <p className="font-bold my-1">{t("Theo dõi cứu hộ (B) và người bị nạn (A)")}</p>
+                                    <Direction origin={origin} destination={destination} />
+                                </div>
+                            ) : (
+                                <div className="w-full flex flex-1 flex-col">
+                                    <p className="font-bold my-1">{t("Theo dõi vị trí của bạn (B) và người bị nạn (A)")}</p>
+                                    <Direction origin={origin} destination={{ lat: parseFloat(location.lat), lng: parseFloat(location.lng) }} />
+                                </div>
+                            )}
                         </div>
-                        {origin && destination && (
-                            <Direction origin={origin} destination={destination} />
-                        )}
-                    </div>
-                </Popup>
-            )}
+                    </Popup>
+                )
+            }
         </div >
     );
 };

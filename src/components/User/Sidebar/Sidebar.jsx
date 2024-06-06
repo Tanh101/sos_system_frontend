@@ -4,9 +4,10 @@ import { faLocationDot, faBell, faLifeRing, faMessage, faTowerBroadcast, faArrow
 import SidebarItem from "../SidebarItem/SidebarItem"
 import { UserContext } from '../../../Context/UserContext/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { USER_ROLE } from '../../../constants/config';
 
 const Sidebar = () => {
-    const { activeItem, setActiveItem } = useContext(UserContext);
+    const { user, activeItem, setActiveItem } = useContext(UserContext);
     const [isShow, setIsShow] = useState(true);
 
     const handleShowSidebar = () => {
@@ -29,6 +30,9 @@ const Sidebar = () => {
             <SidebarItem isShow={isShow} link="/location" icon={faLocationDot} title="Định vị" active={activeItem === 'location'} onClick={() => handleItemClick('location')} />
             <SidebarItem isShow={isShow} link="/" icon={faTowerBroadcast} title="Khẩn cấp" active={activeItem === 'home'} onClick={() => handleItemClick('home')} />
             <SidebarItem isShow={isShow} link="/messages" icon={faMessage} title="Tin nhắn" active={activeItem === 'messages'} onClick={() => handleItemClick('messages')} />
+            {user.role === USER_ROLE.RESCUER &&
+                <SidebarItem isShow={isShow} link="/rescue" icon={faBell} title="Cứu hộ" active={activeItem === 'rescue'} onClick={() => handleItemClick('rescue')} />
+            }
         </div >
     )
 }

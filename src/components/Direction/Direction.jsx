@@ -1,5 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
-
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     GoogleMap,
     DirectionsService,
@@ -9,29 +8,39 @@ import {
 import { googleMapApiKey, googleMapComponentOptions, mapLibraries } from "../../constants/config";
 
 const Direction = ({ origin, destination }) => {
-    console.log(origin, destination);
-    const [directions, setDirections] = useState();
-    const count = useRef(0);
     const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: googleMapApiKey,
         libraries: mapLibraries
     });
 
-    const mapRef = useRef();
+    const [directions, setDirections] = useState(null);
 
-    const onMapLoad = useCallback((map) => {
-        mapRef.current = map;
-    }, []);
+    const fetchDirections = useCallback(() => {
+        if (!isLoaded || !origin || !destination) return;
 
-    const directionsCallback = (
-        result,
-        status
-    ) => {
-        if (status === "OK" && count.current === 0) {
-            count.current++;
-            setDirections(result);
-        }
-    };
+        const directionsService = new window.google.maps.DirectionsService();
+        const request = {
+            origin: { lat: origin.lat, lng: origin.lng },
+            destination: { lat: destination.lat, lng: destination.lng },
+            travelMode: "DRIVING"
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === "OK") {
+                setDirections(result);
+            } else if (status === "ZERO_RESULTS") {
+                console.log("No route found between the specified locations.");
+                setDirections(null);
+            } else {
+                console.error("Directions request failed with status:", status);
+            }
+        });
+    }, [isLoaded, origin, destination]);
+
+    useEffect(() => {
+        fetchDirections();
+    }, [fetchDirections]);
+
     if (loadError) return "Error";
     if (!isLoaded) return "Loading...";
 
@@ -40,28 +49,14 @@ const Direction = ({ origin, destination }) => {
             <div className="flex flex-1">
                 <GoogleMap
                     mapContainerClassName="w-full h-full"
-                    mapContainerStyle={
-                        {
-                            height: "50vh",
-                            width: "100%"
-                        }
-                    }
+                    mapContainerStyle={{ height: "50vh", width: "100%" }}
                     zoom={15}
                     options={googleMapComponentOptions}
-                    onLoad={onMapLoad}
                 >
-                    <DirectionsService
-                        options={{
-                            origin: { lat: origin?.lat, lng: origin?.lng },
-                            destination: { lat: destination?.lat, lng: destination?.lng },
-                            travelMode: "DRIVING"
-                        }}
-                        callback={directionsCallback}
-                    />
                     {directions && <DirectionsRenderer directions={directions} />}
                 </GoogleMap>
             </div>
-        </div >
+        </div>
     );
 }
 

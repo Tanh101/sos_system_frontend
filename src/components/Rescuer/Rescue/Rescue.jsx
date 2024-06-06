@@ -1,24 +1,22 @@
 import { useContext, useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Select } from "antd";
 import { useTranslation } from "react-i18next";
-import Popup from "reactjs-popup";
 
-import { UserContext, UserProvider } from "../../Context/UserContext/UserContext";
-import RequestService from "../../services/RequestService";
-import Loading from "../Loading/Loading";
-import Post from "./Post/Post";
-import FormRequest from "../Emergency/FormRequest/FormRequest";
-import { UserMarkerPlaceProvider } from "../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
-import PostDetail from "./PostDetail/PostDetail";
+import RequestService from "../../../services/RequestService";
+import { UserContext } from "../../../Context/UserContext/UserContext";
+import Post from "../../Help/Post/Post";
+import PostDetail from "../../Help/PostDetail/PostDetail";
+import Loading from "../../Loading/Loading";
+import { UserMarkerPlaceProvider } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
-const Help = () => {
+const Rescue = () => {
     const { t } = useTranslation();
     const location = useLocation();
 
-    const { getRequests, getRequestType } = RequestService();
+    const { getRescuerRequest, getRequestType, getDangerRequest } = RequestService();
 
     const { user, setActiveItem } = useContext(UserContext);
 
@@ -30,7 +28,7 @@ const Help = () => {
         console.log(`search ${value}`);
     };
 
-    const [realTimeRequest, setRealTimeRequest] = useState([]);
+    const [activeMenu, setActiveMenu] = useState('rescue');
     const [search, setSearch] = useState('');
     const [requests, setRequests] = useState({});
     const [loading, setLoading] = useState(true);
@@ -48,12 +46,22 @@ const Help = () => {
         }
 
         fetchRequestType();
-    }, [])
-
+    }, []);
 
     const fetchRequests = async () => {
         try {
-            const requestsData = await getRequests();
+            const requestsData = await getRescuerRequest();
+            setRequests(requestsData);
+        } catch (error) {
+            console.error("Failed to fetch requests:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchDangerRequests = async () => {
+        try {
+            const requestsData = await getDangerRequest();
             setRequests(requestsData);
         } catch (error) {
             console.error("Failed to fetch requests:", error);
@@ -63,7 +71,7 @@ const Help = () => {
     };
 
     useEffect(() => {
-        setActiveItem('help');
+        setActiveItem('rescue');
         fetchRequests();
     }, [location]);
 
@@ -72,7 +80,17 @@ const Help = () => {
         if (user && user.role === 'rescuer') {
 
         }
-    }, [user, realTimeRequest]);
+    }, [user]);
+
+    const handleRequestManagement = () => {
+        setActiveMenu('rescue');
+        fetchRequests();
+    }
+
+    const handleDangerManagement = () => {
+        setActiveMenu('danger');
+        fetchDangerRequests();
+    }
 
     if (loading) {
         return <Loading />
@@ -91,6 +109,19 @@ const Help = () => {
                             <Routes>
                                 <Route path="" element={
                                     <>
+                                        <div className="flex justify-between w-1/3 mb-5 mx-5 font-bold">
+                                            {/* <button className="px-3 py-1 hover:bg-red-500 hover:text-white rounded-md">{t("Thống kê")}</button> */}
+                                            <button className={`px-3 py-1 hover:bg-red-500 hover:text-white rounded-md ${activeMenu === 'rescue' ? 'bg-red-500 text-white' : ''}`}
+                                                onClick={() => handleRequestManagement()}
+                                            >
+                                                {t("Quản lý yêu cầu")}
+                                            </button>
+                                            <button className={`px-3 py-1 hover:bg-red-500 hover:text-white rounded-md ${activeMenu === 'danger' ? 'bg-red-500 text-white' : ''}`}
+                                                onClick={() => handleDangerManagement()}>
+                                                {t("Quản lý cảnh báo")}
+                                            </button>
+
+                                        </div>
                                         <div className="flex justify-between mx-5 sticky top-0 bg-white">
                                             <div className="flex justify-center items-center w-96 px-2 py-2 border outline-none focus:border-red-600 rounded-xl">
                                                 <FontAwesomeIcon icon={faSearch} color='red' size='lg' />
@@ -98,16 +129,6 @@ const Help = () => {
                                                     type="text"
                                                     placeholder={t("Tìm kiếm yêu cầu...")}
                                                     onChange={(e) => setSearch(e.target.value)} />
-                                            </div>
-                                            <div className="flex justify-center items-center">
-                                                <Popup
-                                                    trigger={<button className="p-2 bg-red-600 text-white rounded-2xl">{t("Tạo yêu cầu")}</button>}
-                                                    modal
-                                                    nested
-                                                    contentStyle={{ borderRadius: '10px' }}
-                                                >
-                                                    <FormRequest isEmergency={false} />
-                                                </Popup>
                                             </div>
                                         </div>
                                         <Post requests={requests} setRequests={setRequests}
@@ -174,4 +195,4 @@ const Help = () => {
     );
 };
 
-export default Help;
+export default Rescue;

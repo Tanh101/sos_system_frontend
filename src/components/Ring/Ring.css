@@ -364,3 +364,9 @@
         transform: rotate(0) scale(1.5) skew(1deg)
     }
 }
+
+.MuiPaper-root {
+    left: 110px;
+    bottom: 250px;
+    border-radius: 10px;
+}
