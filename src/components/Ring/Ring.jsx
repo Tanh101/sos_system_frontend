@@ -17,6 +17,7 @@ import { REQUEST_STATUS } from "../../constants/config";
 import socketInstance from "../../utilities/socketInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { removeEmergencyRequest } from "../../redux/action/emergencyAction";
+import { UserContext } from "../../Context/UserContext/UserContext";
 
 const Transition = React.forwardRef(function Transition(
     props,
@@ -34,7 +35,7 @@ const Ring = () => {
     const { emitWithToken } = socketInstance();
 
     const { updateRequestStatus, getRequests } = RequestService();
-
+    const { location } = useContext(UserContext);
 
     const [open, setOpen] = useState(false);
     const [openPopup, setOpenPopup] = useState(false);

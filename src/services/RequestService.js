@@ -274,6 +274,38 @@ const RequestService = () => {
         }
     }
 
+    const processDangerResponse = (data) => {
+        try {
+            const res = data.map((item) => {
+                return {
+                    location: {
+                        lat: item.location.coordinates[1],
+                        lng: item.location.coordinates[0]
+                    },
+                    radius: item.radius,
+                    message: item.message,
+                }
+            });
+
+            return res;
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
+    const getDangerArea = async () => {
+        try {
+            const response = await api.get("/danger");
+            if (response.status === 200) {
+                const dangerData = processDangerResponse(response.data);
+                return dangerData;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
 
     return {
         getRequestType,
@@ -287,6 +319,7 @@ const RequestService = () => {
         getRequestIsTracking,
         getRescuerRequest,
         getDangerRequest,
+        getDangerArea,
     };
 };
 

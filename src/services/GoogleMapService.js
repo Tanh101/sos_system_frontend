@@ -15,10 +15,13 @@ function GoogleMapService() {
             const response = await fetch(`${googleMapApiUrl}latlng=${location.lat},${location.lng}&key=${apiKey}`);
             if (response.status === 200) {
                 const data = await response.json();
-                return data.results[0].formatted_address;
+                if (data.results.length > 0) {
+                    return data.results[0].formatted_address;
+                }
             }
+            return null;
         } catch (error) {
-            errorProcessor(error);
+            console.log(error);
         }
     }
 

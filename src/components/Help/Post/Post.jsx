@@ -48,7 +48,20 @@ const Post = ({ requests, setRequests }) => {
 
     const handleResponse = async (event, item, status) => {
         event.stopPropagation();
-        const updatedRequest = await updateRequestStatus(item.id, status);
+        setLoading(true);
+        try {
+            const updatedRequest = await updateRequestStatus(item.id, status);
+            setRequests((prevRequests) => ({
+                ...prevRequests,
+                requests: prevRequests.requests.map((req) =>
+                    req.id === item.id ? { ...req, status: updatedRequest.status } : req
+                ),
+            }));
+        } catch (err) {
+            Toastify.error('Failed to update status');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handlePostClick = (item) => {
@@ -57,7 +70,6 @@ const Post = ({ requests, setRequests }) => {
 
     return (
         <div className='flex flex-col'>
-            
             {requests?.requests?.length > 0 && requests.requests.map((item, index) => (
                 <div key={index}
                     className="flex flex-col bg-white hover:bg-slate-50 rounded-xl mx-5 mt-1 py-1 w-auto cursor-pointer"
@@ -140,7 +152,7 @@ const Post = ({ requests, setRequests }) => {
                                     </div>
                                 </div>
                             </div>
-                            {user?.role === 'rescuer' && item.status === 0 && (
+                            {user?.role === 'rescuer' && item.status === REQUEST_STATUS.PENDING && (
                                 <div className="flex justify-center items-center">
                                     <button onClick={(event) => handleResponse(event, item, REQUEST_STATUS.RESCUING)}>
                                         <FontAwesomeIcon
@@ -148,6 +160,10 @@ const Post = ({ requests, setRequests }) => {
                                             icon={faCheck} color="red" size="xl"
                                         />
                                     </button>
+                                </div>
+                            )}
+                            {user?.role === 'rescuer' && item.status === REQUEST_STATUS.RESCUING && (
+                                <div className="flex justify-center items-center">
                                     <button onClick={(event) => handleResponse(event, item, REQUEST_STATUS.REJECTED)}>
                                         <FontAwesomeIcon
                                             className='hover:text-black px-3 py-2 rounded-full hover:bg-slate-300'

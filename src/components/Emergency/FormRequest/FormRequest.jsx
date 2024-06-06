@@ -17,6 +17,7 @@ import RequestService from "../../../services/RequestService";
 import Loading from "../../Loading/Loading";
 import FileUpload from "../../FileUpload/FileUpload";
 import { addEmergencyRequest } from "../../../redux/action/emergencyAction";
+import { UserContext } from "../../../Context/UserContext/UserContext";
 
 const { Option } = Select;
 
@@ -29,6 +30,7 @@ const FormRequest = ({ isEmergency }) => {
 
     const { requestLocation } = useContext(UserMarkerPlaceContext);
 
+    const { location, startSharingLocation } = useContext(UserContext);
 
     const { getRequestType, createRequest } = RequestService();
 
@@ -45,6 +47,7 @@ const FormRequest = ({ isEmergency }) => {
             const request = await createRequest({ isEmergency, ...requestLocation });
             if (request) {
                 dispatch(addEmergencyRequest(request));
+                startSharingLocation(request.id, request.latitude, request.longitude);
             }
 
         } else {
@@ -64,7 +67,7 @@ const FormRequest = ({ isEmergency }) => {
 
     return (
         <>
-            {requestType && requestType.length > 0 ? (
+            {requestType && requestType.length > 0 && location.lat && location.lng ? (
                 <div className='bg-white items-center justify-center rounded-lg shadow-lg px-6 pb-6 min-w-96 w-full'>
                     <form className="flex flex-col rounded-xl" onSubmit={handleSubmit(formSubmit)}>
                         <div className="flex lg:flex-row flex-col justify-start lg:items-center items-start m-2 my-5">

@@ -80,7 +80,7 @@ export const UserProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        if (location.lat && location.lng && user.role === 'user') {
+        if (location.lat && location.lng) {
             upDateLocationToMongo(location);
         }
 
@@ -92,7 +92,6 @@ export const UserProvider = ({ children }) => {
                 if (distance > 10) {
                     upDateLocationToMongo(response);
                     setLocation(response);
-                    console.log("Rescuer location updated");
                 }
             }, 2000);
         }
@@ -104,36 +103,42 @@ export const UserProvider = ({ children }) => {
         };
     }, [location, user]);
 
+    const startSharingLocation = (requestId, lat, lng) => {
+        emitWithToken("startSharingLocation", {
+            requestId: requestId,
+            latitude: lat,
+            longitude: lng,
+        });
+        socket.on("locationSharingStarted", (data) => {
+            updateLocationWithSocket();
+        })
+    }
+
+    const updateLocationWithSocket = async () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+        intervalRef.current = setInterval(async () => {
+            const response = await getCurrentUserLocation();
+            const distance = getDistance(location, response);
+            if (distance > 10) {
+                setLocation(response);
+                emitWithToken("updateLocation", {
+                    requestId: emergencyRequests[0].id,
+                    latitude: response.lat,
+                    longitude: response.lng,
+                });
+            }
+
+        }, 2000);
+    };
+
     useEffect(() => {
-        if (emergencyRequests.length > 0 && socket && location.lat && location.lng && user.id === emergencyRequests[0].userId) {
-            emitWithToken("startSharingLocation", {
-                requestId: emergencyRequests[0].id,
-                latitude: location.lat,
-                longitude: location.lng,
-            });
-
-            socket.on("locationSharingStarted", (data) => {
-                if (intervalRef.current) {
-                    clearInterval(intervalRef.current);
-                }
-
-                intervalRef.current = setInterval(async () => {
-                    const response = await getCurrentUserLocation();
-                    const distance = getDistance(location, response);
-                    if (distance > 10) {
-                        setLocation(response);
-                        emitWithToken("updateLocation", {
-                            requestId: emergencyRequests[0].id,
-                            latitude: response.lat,
-                            longitude: response.lng,
-                        });
-                        console.log("user Location updated");
-                    }
-
-                }, 2000);
-            });
-
-        } else {
+        if (emergencyRequests.length > 0 && socket && location.lat
+            && location.lng && user.id === emergencyRequests[0].userId) {
+            updateLocationWithSocket();
+        }
+        else {
             clearInterval(intervalRef.current);
         }
 
@@ -150,6 +155,7 @@ export const UserProvider = ({ children }) => {
             activeItem,
             setActiveItem,
             location,
+            startSharingLocation,
         }}>
             {children}
         </UserContext.Provider>

@@ -28,6 +28,7 @@ import { formatHHmm } from "../../../utilities/formatDate";
 import { UserContext } from "../../../Context/UserContext/UserContext";
 import socketInstance, { socket } from '../../../utilities/socketInstance';
 import Status from "../../Status/Status";
+import UserDirection from "../../Direction/UserDirection/UserDirection";
 
 const PostDetail = () => {
     const navigate = useNavigate();
@@ -71,7 +72,6 @@ const PostDetail = () => {
                         lat: parseFloat(data.latitude),
                         lng: parseFloat(data.longitude)
                     };
-
                     setOrigin(location);
                 });
 
@@ -89,17 +89,28 @@ const PostDetail = () => {
                 }
             };
 
-            joinRoomAndListen();
+            const listenUpdateStatus = () => {
+                emitWithToken('joinRequestDetailRoom', { requestId: requestId });
 
+                socket.on('updatedStatus', (data) => {
+                    setPost((prevPost) => ({
+                        ...prevPost,
+                        status: data.status
+                    }));
+                });
+            };
             intervalRef.current = setInterval(() => {
                 joinRoomAndListen();
-            }, 5000);
+            }, 2000);
+
+            listenUpdateStatus();
         }
 
         return () => {
             clearInterval(intervalRef.current);
             socket.off('locationUpdate');
             socket.off('returnRescuerLocation');
+            emitWithToken('leaveRequestRoom', { requestId: post?.id });
         };
     }, [post, socket]);
 
@@ -357,17 +368,25 @@ const PostDetail = () => {
                                     <FontAwesomeIcon icon={faClose} size="lg" />
                                 </button>
                             </div>
-                            {origin.lat && origin.lng && destination.lat && destination.lng ? (
+                            {origin.lat && origin.lng && post.userId === user.id && post.status === REQUEST_STATUS.PENDING ? (
                                 <div className="flex flex-1 w-full flex-col">
-                                    <p className="font-bold my-1">{t("Theo dõi cứu hộ (B) và người bị nạn (A)")}</p>
-                                    <Direction origin={origin} destination={destination} />
+                                    <p className="font-bold my-1">{t("Vị trí của bạn")}</p>
+                                    <UserDirection location={origin} address={post?.address} />
                                 </div>
                             ) : (
-                                <div className="w-full flex flex-1 flex-col">
-                                    <p className="font-bold my-1">{t("Theo dõi vị trí của bạn (B) và người bị nạn (A)")}</p>
-                                    <Direction origin={origin} destination={{ lat: parseFloat(location.lat), lng: parseFloat(location.lng) }} />
-                                </div>
+                                origin.lat && origin.lng && destination.lat && destination.lng ? (
+                                    <div className="flex flex-1 w-full flex-col">
+                                        <p className="font-bold my-1">{t("Theo dõi cứu hộ (B) và người bị nạn (A)")}</p>
+                                        <Direction origin={origin} destination={destination} />
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex flex-1 flex-col">
+                                        <p className="font-bold my-1">{t("Theo dõi vị trí của bạn (B) và người bị nạn (A)")}</p>
+                                        <Direction origin={origin} destination={{ lat: parseFloat(location.lat), lng: parseFloat(location.lng) }} />
+                                    </div>
+                                )
                             )}
+
                         </div>
                     </Popup>
                 )
