@@ -1,6 +1,6 @@
-import ErrorProcessService from "/src/services/ErrorProcessService.js";
-import api from "/src/utilities/api.js";
-import GoogleMapService from "/src/services/GoogleMapService.js";
+import ErrorProcessService from "../services/ErrorProcessService.js";
+import api from "../utilities/api.js";
+import GoogleMapService from "../services/GoogleMapService";
 
 const LocationService = () => {
     const { ReverseGeocoding } = GoogleMapService();
@@ -50,7 +50,7 @@ const LocationService = () => {
                 longitude: location.lng
             });
         } catch (error) {
-            errorProcessor(error);
+            console.log(error);
         }
     };
 

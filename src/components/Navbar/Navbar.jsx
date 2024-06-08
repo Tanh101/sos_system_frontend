@@ -14,8 +14,13 @@ import IconButton from '@mui/material/IconButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import NotificationList from '../NotificationList/NotificationList';
 import { Dropdown } from 'antd';
+import socketInstance, { socket } from '../../utilities/socketInstance';
+import { USER_ROLE } from '../../constants/config';
+
 const Navbar = () => {
     const { t } = useTranslation();
+
+    const { emitWithToken } = socketInstance();
 
     const { handleChangeLanguage, currentLanguage } = useContext(LocaleContext);
     const { user } = useContext(UserContext);
@@ -25,6 +30,7 @@ const Navbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const notificationRef = useRef(null);
+    const [notificationList, setNotificationList] = useState([]);
 
     const { logout } = AuthService();
 
@@ -62,11 +68,12 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        if (user && user.role === 'rescuer') {
-            //setCount for notification
-        } else if (user && user.role === 'user') {
-            //set count for notification
-        }
+        emitWithToken("getNotification");
+
+        socket.on("notificationList", (data) => {
+            setCount(data.length);
+            setNotificationList(data);
+        });
     }, [user]);
 
     return (
@@ -92,7 +99,7 @@ const Navbar = () => {
                     </div>
                     {isOpen && (
                         <div className="absolute top-full -right-1/4 mt-2 w-64 bg-white rounded-md shadow-lg z-50" >
-                            <NotificationList />
+                            <NotificationList notificationList={notificationList} />
                         </div>
                     )}
                 </div>

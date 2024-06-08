@@ -1,7 +1,9 @@
 import ErrorProcessService from "./ErrorProcessService";
+import GoogleMapService from "./GoogleMapService";
 
 function PlaceService() {
     const { errorProcessor } = ErrorProcessService();
+    const { ReverseGeocoding } = GoogleMapService();
 
     const getAnotherUserRequestPlaces = async () => {
         try {
@@ -13,13 +15,6 @@ function PlaceService() {
 
     const getRescuerPlaces = async () => {
         try {
-            // const response = await api.get(`/places/rescuer`, {
-            //     params: {
-            //         lat: userLocation.lat,
-            //         lng: userLocation.lng,
-            //     },
-            // });
-
             const rescuerPlaces = [
                 {
                     info: "264 Hoàng Văn Thái, Hòa Khánh Nam, Liên Chiểu, Da Nang, Vietnam",
@@ -60,9 +55,41 @@ function PlaceService() {
         }
     }
 
+    const processRescuerPlaces = async (data) => {
+        const rescuerPlaces = [];
+
+        for (const location of data) {
+            const newLocation = {
+                lat: location.latitude,
+                lng: location.longitude
+            }
+
+            try {
+                const response = await ReverseGeocoding(newLocation);
+
+                if (response) {
+                    rescuerPlaces.push({
+                        info: response,
+                        location: {
+                            lat: parseFloat(newLocation.lat),
+                            lng: parseFloat(newLocation.lng)
+                        }
+                    });
+                } else {
+                    console.error('Geocode error:', geocodeData.status);
+                }
+
+            } catch (error) {
+                errorProcessor(error);
+            }
+        }
+        return rescuerPlaces;
+    }
+
     return {
         getAnotherUserRequestPlaces,
         getRescuerPlaces,
+        processRescuerPlaces,
     };
 }
 

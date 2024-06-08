@@ -12,9 +12,9 @@ import {
 const PlaceInfo = ({ selected, setSelected, userPlace, rescuerPlaces, requestPlace, searchLocation }) => {
     return (
         <>
-            {rescuerPlaces?.length > 0 && rescuerPlaces.map((marker) => (
+            {rescuerPlaces?.length > 0 && rescuerPlaces.map((marker, key) => (
                 <Marker
-                    key={`${marker.location.lat * marker.location.lng}`}
+                    key={key}
                     position={{
                         lat: marker.location.lat,
                         lng: marker.location.lng
