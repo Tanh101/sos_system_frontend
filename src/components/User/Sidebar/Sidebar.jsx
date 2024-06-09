@@ -19,7 +19,7 @@ const Sidebar = () => {
     };
 
     return (
-        <div className={`flex flex-col items-start h-screen duration-150 md:px-1 min-w-20 bg-white ${isShow ? 'w-52' : 'w-16'} border-r`}>
+        <div className={`flex flex-col items-start h-screen duration-150 md:px-1 min-w-20 bg-white ${isShow ? 'w-64' : 'w-16'} border-r`}>
             <div className={`flex ${isShow ? 'justify-start' : 'justify-start'} mx-1 items-center h-10 w-full mt-2 transition ease-in-out delay-100 border-b`}>
                 <div className="relative justify-start text-start px-4">
                     <FontAwesomeIcon className="cursor-pointer" icon={faBars} style={{ color: "#000" }} size="xl" onClick={handleShowSidebar} />

@@ -7,8 +7,6 @@ import { UserContext } from "../../../Context/UserContext/UserContext";
 import PlaceService from "../../../services/PlaceService";
 import { UserMarkerPlaceContext } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
 
-const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
 const libraries = ["places"];
 
 const options = {
@@ -17,8 +15,7 @@ const options = {
 };
 
 const RequestMap = ({ mapContainerStyle }) => {
-
-    const { location } = useContext(UserContext);
+    const { location, googleMapApiKey } = useContext(UserContext);
 
     const { requestLocation } = useContext(UserMarkerPlaceContext);
 
@@ -35,7 +32,7 @@ const RequestMap = ({ mapContainerStyle }) => {
     }, []);
 
     const { isLoaded, loadError } = useJsApiLoader({
-        googleMapsApiKey: apiKey,
+        googleMapsApiKey: googleMapApiKey,
         libraries
     });
 

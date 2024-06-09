@@ -21,7 +21,6 @@ const Location = () => {
         setActiveItem("location");
     }, []);
 
-    console.log(searchLocation);
     return (
         <div className="flex flex-col flex-1 w-full bg-white">
             <div className="relative flex-1">

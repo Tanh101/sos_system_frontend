@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useJsApiLoader } from "@react-google-maps/api";
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
 
-import { googleMapApiKey, mapLibraries } from '../../constants/config';
+import { mapLibraries } from '../../constants/config';
 import { Toastify } from '../../toastify/Toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons/faLocationDot';
+import { UserContext } from '../../Context/UserContext/UserContext';
 
 const LocationSearchInput = ({ searchLocation, setSearchLocation }) => {
+    const { googleMapApiKey } = useContext(UserContext);
+
     const [address, setAddress] = useState('');
 
     const { isLoaded } = useJsApiLoader({

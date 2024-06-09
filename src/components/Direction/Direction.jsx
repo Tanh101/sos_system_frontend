@@ -1,13 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
     GoogleMap,
     DirectionsService,
     DirectionsRenderer,
     useJsApiLoader
 } from "@react-google-maps/api";
-import { googleMapApiKey, googleMapComponentOptions, mapLibraries } from "../../constants/config";
+import { googleMapComponentOptions, mapLibraries } from "../../constants/config";
+import { UserContext } from "../../Context/UserContext/UserContext";
 
 const Direction = ({ origin, destination }) => {
+    const { googleMapApiKey } = useContext(UserContext);
+
     const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: googleMapApiKey,
         libraries: mapLibraries

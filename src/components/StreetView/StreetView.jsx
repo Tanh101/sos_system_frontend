@@ -3,7 +3,6 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import PlaceInfo from '../MyMapComponent/PlaceInfo';
 import {
     EmergencyMapContainerStyle,
-    googleMapApiKey,
     googleMapComponentOptions,
     mapLibraries
 } from '../../constants/config';
@@ -13,7 +12,7 @@ import { UserContext } from '../../Context/UserContext/UserContext';
 
 const StreetView = ({ requestPlace }) => {
     const { getRescuerPlaces } = PlaceService();
-    const location = useContext(UserContext);
+    const { location, googleMapApiKey } = useContext(UserContext);
     const [rescuerPlaces, setRescuerPlaces] = useState([]);
 
     const { isLoaded, loadError } = useJsApiLoader({
