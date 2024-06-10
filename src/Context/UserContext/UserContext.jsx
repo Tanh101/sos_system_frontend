@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchEmergencyRequest } from '../../redux/action/emergencyAction';
 import socketInstance, { socket } from '../../utilities/socketInstance';
 import { getDistance } from '../../utilities/distance';
+import GoogleMapService from '../../services/GoogleMapService';
+import Loading from '../../components/Loading/Loading';
 
 export const UserContext = createContext();
 
@@ -22,6 +24,7 @@ export const UserProvider = ({ children }) => {
     const { getCurrentUserLocation, createOrUpdateUserLocation } = LocationService();
     const { getRequestIsTracking } = RequestService();
     const { getUserProfile } = AuthService();
+    const { getGoogleMapAPIKey } = GoogleMapService();
 
     const { connectSocket, disconnectSocket, emitWithToken } = socketInstance();
 
@@ -30,6 +33,8 @@ export const UserProvider = ({ children }) => {
     const [location, setLocation] = useState({ lat: null, lng: null, address: null });
     const intervalRef = useRef(null);
     const rescuerIntervalRef = useRef(null);
+    const [googleMapApiKey, setGoogleMapApiKey] = useState(null);
+    const [isApiKeyLoaded, setIsApiKeyLoaded] = useState(false);
 
     const fetchUserLocation = async () => {
         const userLocation = await getCurrentUserLocation();
@@ -42,23 +47,22 @@ export const UserProvider = ({ children }) => {
             dispatch(fetchEmergencyRequest(response?.requests))
         }
 
-        getEmergencyReq();
-    }, []);
+        const fetchGoogleMapAPIKey = async () => {
+            const key = await getGoogleMapAPIKey();
+            setGoogleMapApiKey(key);
+            setIsApiKeyLoaded(true);
+        }
 
-
-    useEffect(() => {
         const fetchUserProfile = async () => {
             const userProfile = await getUserProfile();
             setUser(userProfile);
         }
 
+        getEmergencyReq();
+        fetchGoogleMapAPIKey();
+        fetchUserLocation();
         fetchUserProfile();
     }, []);
-
-    useEffect(() => {
-        fetchUserLocation();
-    }, []);
-
 
     useEffect(() => {
         if (user) {
@@ -80,11 +84,13 @@ export const UserProvider = ({ children }) => {
     }
 
     useEffect(() => {
+        console.log('useEffect line 84');
         if (location.lat && location.lng) {
             upDateLocationToMongo(location);
         }
 
         if (location.lat && location.lng && user.role === 'rescuer') {
+
             rescuerIntervalRef.current = setInterval(async () => {
                 let distance = 0;
                 const response = await getCurrentUserLocation();
@@ -94,6 +100,7 @@ export const UserProvider = ({ children }) => {
                     setLocation(response);
                 }
             }, 2000);
+
         }
 
         return () => {
@@ -134,6 +141,7 @@ export const UserProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        console.log('useEffect line 141');
         if (emergencyRequests.length > 0 && socket && location.lat
             && location.lng && user.id === emergencyRequests[0].userId) {
             updateLocationWithSocket();
@@ -156,8 +164,9 @@ export const UserProvider = ({ children }) => {
             setActiveItem,
             location,
             startSharingLocation,
+            googleMapApiKey,
         }}>
-            {children}
+            {isApiKeyLoaded ? children : <Loading />}
         </UserContext.Provider>
     );
 }

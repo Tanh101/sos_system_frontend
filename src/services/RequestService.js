@@ -40,7 +40,9 @@ const RequestService = () => {
                 voteType: item?.votes[0]?.voteType,
                 distance: item.distance,
                 userId: item.userId,
-                rescuerId: item.rescuerId
+                rescuerId: item.rescuerId,
+                commentCount: item.commentCount,
+                comments: item.comments,
             }
             return res;
         } catch (error) {
@@ -110,6 +112,7 @@ const RequestService = () => {
                     distance: item?.distance,
                     userId: item.userId,
                     rescuerId: item.rescuerId,
+                    commentCount: item.commentCount,
                 };
             });
         } catch (error) {
@@ -284,6 +287,10 @@ const RequestService = () => {
                     },
                     radius: item.radius,
                     message: item.message,
+                    updatedAt: item.updatedAt,
+                    requestId: item.requestId,
+                    rescuerId: item.rescuerId,
+                    address: item?.address,
                 }
             });
 
@@ -307,6 +314,31 @@ const RequestService = () => {
         }
     }
 
+    const isExistDangerInRequest = async (id) => {
+        try {
+            const response = await api.get(`/danger/${id}`);
+            if (response.status === 200) {
+                return response.data;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
+    const getDangerByRescuer = async () => {
+        try {
+            const response = await api.get("/danger/rescuer");
+            if (response.status === 200) {
+                const dangerData = processDangerResponse(response.data);
+                return dangerData;
+            }
+        } catch (error) {
+            console.log(error);
+            errorProcessor(error);
+        }
+    }
+
     return {
         getRequestType,
         createRequest,
@@ -320,6 +352,8 @@ const RequestService = () => {
         getRescuerRequest,
         getDangerRequest,
         getDangerArea,
+        isExistDangerInRequest,
+        getDangerByRescuer,
     };
 };
 

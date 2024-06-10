@@ -6,9 +6,16 @@ import { UserContext } from "../../Context/UserContext/UserContext";
 import PlaceInfo from "./PlaceInfo";
 import Loading from "../Loading/Loading";
 import PlaceService from "../../services/PlaceService";
-import { googleMapComponentOptions, mapLibraries, googleMapApiKey } from "../../constants/config";
+import { googleMapComponentOptions, mapLibraries } from "../../constants/config";
 import RequestService from "../../services/RequestService";
 import socketInstance, { socket } from '../../utilities/socketInstance';
+
+const libraries = ["places"];
+
+const options = {
+    disableDefaultUI: true,
+    zoomControl: true
+};
 
 const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
     const { emitWithToken } = socketInstance();
@@ -16,7 +23,7 @@ const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
     const { processRescuerPlaces } = PlaceService();
     const { getDangerArea } = RequestService();
 
-    const { location } = useContext(UserContext);
+    const { location, googleMapApiKey } = useContext(UserContext);
 
     const [rescuerPlaces, setRescuerPlaces] = useState([]);
     const [selected, setSelected] = useState(null);
@@ -73,7 +80,7 @@ const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
 
     const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: googleMapApiKey,
-        libraries: mapLibraries
+        libraries
     });
 
     const mapRef = useRef();
@@ -82,17 +89,17 @@ const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
         mapRef.current = map;
     }, []);
 
-    if (!isLoaded) return <Loading />;
-    if (loadError) return "Error loading map";
+    if (loadError) return "Error";
+    if (!isLoaded) return "Loading...";
 
     return (
-        location?.lat && location?.lng ? (
+        location?.lat && location?.lng && googleMapApiKey ? (
             <GoogleMap
                 id="map"
                 mapContainerStyle={mapContainerStyle}
                 zoom={14}
                 center={center}
-                options={googleMapComponentOptions}
+                options={options}
                 onLoad={onMapLoad}
             >
                 <PlaceInfo
@@ -106,7 +113,10 @@ const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
                 {dangerArea.length > 0 && dangerArea.map((item, index) => (
                     <Circle
                         key={index}
-                        center={item.location}
+                        center={{
+                            lat: parseFloat(item.location.lat),
+                            lng: parseFloat(item.location.lng)
+                        }}
                         radius={item.radius}
                         options={{
                             strokeColor: '#FF0000',
@@ -117,7 +127,10 @@ const MyMapComponent = ({ mapContainerStyle, searchLocation }) => {
                         }}
                         onClick={() => {
                             setSelected({ info: item.message, location: item.location });
-                            setCenter(item.location);
+                            setCenter({
+                                lat: parseFloat(item.location.lat),
+                                lng: parseFloat(item.location.lng)
+                            });
                         }}
                     />
                 ))}

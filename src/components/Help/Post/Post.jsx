@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faAngleDown, faAngleUp, faCheck, faRemove, faSearch, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
@@ -51,12 +51,14 @@ const Post = ({ requests, setRequests }) => {
         setLoading(true);
         try {
             const updatedRequest = await updateRequestStatus(item.id, status);
-            setRequests((prevRequests) => ({
-                ...prevRequests,
-                requests: prevRequests.requests.map((req) =>
-                    req.id === item.id ? { ...req, status: updatedRequest.status } : req
-                ),
-            }));
+            if (updatedRequest) {
+                setRequests((prevRequests) => ({
+                    ...prevRequests,
+                    requests: prevRequests.requests.map((req) =>
+                        req.id === item.id ? { ...req, status: updatedRequest.status } : req
+                    ),
+                }));
+            }
         } catch (err) {
             Toastify.error('Failed to update status');
         } finally {
@@ -148,7 +150,7 @@ const Post = ({ requests, setRequests }) => {
                                             className='cursor-pointer pl-2 py-2 rounded-2xl'
                                             icon={faComment} color="red" size='lg'
                                         />
-                                        <p className='text-sm font-bold text-slate-500 px-2'>12</p>
+                                        <p className='text-sm font-bold text-slate-500 px-2'>{item?.commentCount}</p>
                                     </div>
                                 </div>
                             </div>
@@ -164,7 +166,7 @@ const Post = ({ requests, setRequests }) => {
                             )}
                             {user?.role === 'rescuer' && item.status === REQUEST_STATUS.RESCUING && (
                                 <div className="flex justify-center items-center">
-                                    <button onClick={(event) => handleResponse(event, item, REQUEST_STATUS.REJECTED)}>
+                                    <button onClick={(event) => handleResponse(event, item, REQUEST_STATUS.PENDING)}>
                                         <FontAwesomeIcon
                                             className='hover:text-black px-3 py-2 rounded-full hover:bg-slate-300'
                                             icon={faRemove} color="red" size="xl"
@@ -182,8 +184,7 @@ const Post = ({ requests, setRequests }) => {
 
 Post.propTypes = {
     requests: PropTypes.object.isRequired,
-    setRequests: PropTypes.func.isRequired,
-    realTimeRequest: PropTypes.array
+    setRequests: PropTypes.func,
 };
 
 export default Post;

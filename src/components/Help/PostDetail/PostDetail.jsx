@@ -3,19 +3,30 @@ import {
     faAngleDown,
     faAngleUp,
     faArrowLeft,
+    faCheck,
     faClose,
     faComment,
     faEarth,
     faEllipsis,
     faLocationDot,
     faPaperPlane,
+    faTrash,
+    faWarning,
 } from "@fortawesome/free-solid-svg-icons";
 import { faEdit, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Popup from "reactjs-popup";
-import { Dropdown, Image } from 'antd';
+import { Dropdown, Image, message } from 'antd';
 import { useTranslation } from "react-i18next";
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+import Button from '@mui/material/Button';
 
 import "./PostDetail.css";
 import avatar from '../../../assets/imgs/avatar.png';
@@ -23,12 +34,19 @@ import RequestService from "../../../services/RequestService";
 import { Toastify } from "../../../toastify/Toastify";
 import Loading from "../../Loading/Loading";
 import Direction from "../../Direction/Direction";
-import { REQUEST_STATUS, VOTE_TYPE } from "../../../constants/config";
+import { REQUEST_STATUS, USER_ROLE, VOTE_TYPE } from "../../../constants/config";
 import { formatHHmm } from "../../../utilities/formatDate";
 import { UserContext } from "../../../Context/UserContext/UserContext";
 import socketInstance, { socket } from '../../../utilities/socketInstance';
 import Status from "../../Status/Status";
 import UserDirection from "../../Direction/UserDirection/UserDirection";
+
+const Transition = React.forwardRef(function Transition(
+    props,
+    ref
+) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const PostDetail = () => {
     const navigate = useNavigate();
@@ -37,7 +55,7 @@ const PostDetail = () => {
     const { id } = useParams();
     const { t } = useTranslation();
 
-    const { getRequestDetail, vote } = RequestService();
+    const { getRequestDetail, vote, updateRequestStatus, isExistDangerInRequest, getDangerArea } = RequestService();
 
     const { user, location } = useContext(UserContext);
 
@@ -47,6 +65,15 @@ const PostDetail = () => {
     const [destination, setDestination] = useState({});
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState('');
+    const [commentCount, setCommentCount] = useState(0);
+    const [open, setOpen] = useState(false);
+    const [dangerInput, setDangerInput] = useState({
+        radius: 0,
+        message: ''
+    });
+
+    const [exitsDanger, setExitsDanger] = useState({});
+    const [openEdit, setOpenEdit] = useState(false);
 
     const intervalRef = useRef(null);
 
@@ -99,9 +126,8 @@ const PostDetail = () => {
                     }));
                 });
             };
-            intervalRef.current = setInterval(() => {
-                joinRoomAndListen();
-            }, 2000);
+
+            joinRoomAndListen();
 
             listenUpdateStatus();
         }
@@ -124,48 +150,173 @@ const PostDetail = () => {
         navigate('/messages');
     };
 
+    const handleUpdateStatus = async (status) => {
+        try {
+            const response = await updateRequestStatus(id, status);
+            setPost((prevPost) => ({
+                ...prevPost,
+                status: response.status
+            }));
+        } catch (error) {
+            console.error('Failed to update status:', error);
+        }
+    };
+
+    const handleSendWarning = async () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const submitDangerWarning = async () => {
+        try {
+            emitWithToken("createDangerArea", {
+                requestId: id,
+                radius: dangerInput.radius,
+                message: dangerInput.message,
+                latitude: post.latitude,
+                longitude: post.longitude,
+                address: post.address,
+            });
+            setOpen(false);
+            message.success('Đã gửi cảnh báo');
+            fetchExistDangerInRequest();
+        } catch (error) {
+            console.error('Failed to send danger warning:', error);
+        }
+    };
+
+    const handleOpenUpdateDangerArea = () => {
+        setOpenEdit(true);
+    };
+
+    const hanleUpdateDangerArea = async () => {
+        try {
+            const fetchExistDangerInRequest = async () => {
+                try {
+                    const response = await isExistDangerInRequest(id);
+                    setExitsDanger(response);
+                }
+                catch (error) {
+                    console.error('Failed to fetch exist danger in request:', error);
+                }
+            };
+
+            emitWithToken("updateDangerArea", {
+                requestId: id,
+                radius: exitsDanger.radius,
+                message: exitsDanger.message,
+                latitude: post.latitude,
+                longitude: post.longitude,
+            });
+            setOpenEdit(false);
+            message.success('Đã sửa cảnh báo');
+        } catch (error) {
+            console.error('Failed to update danger warning:', error);
+        }
+    };
+
+    const handleDeleteDangerArea = async () => {
+        try {
+            emitWithToken("deleteDangerArea", { requestId: id });
+            setOpenEdit(false);
+            message.success('Đã xóa cảnh báo');
+        } catch (error) {
+            console.error('Failed to delete danger warning:', error);
+        }
+    };
+
     const items = [
         ...(user.id === post?.userId ? [{
             key: '1',
             label: (
-                <button onClick={handleMessageClick}>
+                <button className="text-base p-2" onClick={handleMessageClick}>
                     {t("Chỉnh sửa")}
                 </button>
             ),
-            icon: <FontAwesomeIcon icon={faEdit} color="red" />,
+            icon: <FontAwesomeIcon icon={faEdit} style={{ fontSize: '16px', color: 'red' }} />,
         }] : []),
-        {
+        ...(user.id !== post?.userId ? [{
             key: '2',
             label: (
-                <button onClick={handleMessageClick}>
+                <button className="text-base p-2" onClick={handleMessageClick}>
                     {t("Nhắn tin")}
                 </button>
             ),
-            icon: <FontAwesomeIcon icon={faMessage} color="red" />,
-        },
+            icon: <FontAwesomeIcon icon={faMessage} style={{ fontSize: '16px', color: 'red' }} />,
+        }] : []),
         {
             key: '3',
             label: (
-                <button onClick={(event) => handleStreetViewClick(event, post)}>
+                <button className="text-base p-2" onClick={(event) => handleStreetViewClick(event, post)}>
                     {t("Xem vị trí")}
                 </button>
             ),
-            icon: <FontAwesomeIcon icon={faLocationDot} color="red" />,
+            icon: <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: '16px', color: 'red' }} />,
         },
+        ...(exitsDanger && user.role === USER_ROLE.RESCUER && exitsDanger?.rescuerId == user.id ? [{
+            key: '4',
+            label: (
+                <button className="text-base p-2" onClick={handleOpenUpdateDangerArea}>
+                    {t("Sửa cảnh báo nguy hiểm")}
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faEdit} style={{ fontSize: '16px', color: 'red' }} />,
+        }] : []),
+        ...(!exitsDanger && user.role === USER_ROLE.RESCUER ? [{
+            key: '10',
+            label: (
+                <button className="text-base p-2" onClick={handleSendWarning}>
+                    {t("Cảnh báo nguy hiểm")}
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faWarning} style={{ fontSize: '16px', color: 'red' }} />,
+        }] : []),
+        ...(user?.role === USER_ROLE.RESCUER && post?.status === REQUEST_STATUS.PENDING ? [{
+            key: '5',
+            label: (
+                <button className="text-base p-2" onClick={() => { handleUpdateStatus(REQUEST_STATUS.RESCUING) }}>
+                    {t("Xác nhận hỗ trợ")}
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faCheck} style={{ fontSize: '16px', color: 'red' }} />,
+        }] : []),
+        ...(user.role === USER_ROLE.USER && post?.status !== REQUEST_STATUS.RESCUED && user.id === post?.userId ? [{
+            key: '6',
+            label: (
+                <button className="text-base p-2" onClick={() => { handleUpdateStatus(REQUEST_STATUS.RESCUED) }}>
+                    {t("Xác nhận hoàn thành")}
+                </button>
+            ),
+            icon: <FontAwesomeIcon icon={faCheck} style={{ fontSize: '16px', color: 'red' }} />,
+        }] : []),
     ];
 
+    const fetchExistDangerInRequest = async () => {
+        try {
+            const response = await isExistDangerInRequest(id);
+            setExitsDanger(response);
+        }
+        catch (error) {
+            console.error('Failed to fetch exist danger in request:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchPostDetails = async () => {
             try {
                 const postData = await getRequestDetail(id);
                 setPost(postData);
+                setCommentCount(postData?.commentCount);
             } catch (error) {
                 console.error('Failed to fetch post details:', error);
             }
         };
 
         fetchPostDetails();
+        fetchExistDangerInRequest();
     }, []);
 
     const handleVote = async (event, post, voteType) => {
@@ -193,11 +344,68 @@ const PostDetail = () => {
         navigate(-1);
     }
 
+    const handleCommentClick = async () => {
+        if (input) {
+            try {
+                emitWithToken("comment", { requestId: id, content: input });
+                setCommentCount((prevCount) => prevCount + 1);
+                setInput('');
+            } catch (error) {
+                console.error('Failed to create comment:', error);
+            }
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            emitWithToken("deleteComment", { commentId });
+
+        } catch (error) {
+            console.error('Failed to delete comment:', error);
+        }
+    };
+
+    useEffect(() => {
+        emitWithToken("joinRequestDetailRoom", { requestId: id });
+        socket.on("comment", (data) => {
+            const { comment, commentCount } = data;
+            setPost((prevPost) => ({
+                ...prevPost,
+                comments: [...prevPost.comments, comment]
+            }));
+            setCommentCount(commentCount);
+        });
+
+        socket.on("deleteComment", (data) => {
+            const { commentCount, commentId } = data;
+            setCommentCount(commentCount);
+            setPost((prevPost) => ({
+                ...prevPost,
+                comments: prevPost.comments.filter((comment) => comment._id !== commentId)
+            }));
+        });
+
+        socket.on("newVoteUpdate", (data) => {
+            const { voteCount } = data;
+            setPost((prevPost) => ({
+                ...prevPost,
+                voteCount: voteCount,
+            }));
+        });
+
+        return () => {
+            socket.off("comment");
+            socket.off("deleteComment");
+            socket.off("newVoteUpdate");
+            emitWithToken("leaveRequestDetailRoom", { requestId: id });
+        };
+    }, [id]);
+
     return (
         <div>
             {
                 post ? (
-                    <div className='bg-white justify-center text-sm rounded-lg px-3 shadow-lg w-full flex flex-col' >
+                    <div className='bg-white justify-center text-sm rounded-lg px-10 shadow-lg w-full flex flex-col' >
                         <div className="flex justify-between w-1/2 items-center text-xl font-bold pb-4">
                             <div className="flex justify-center items-center">
                                 <FontAwesomeIcon icon={faArrowLeft} className="text-red-500 cursor-pointer px-2 py-1 rounded-full hover:bg-slate-100"
@@ -228,14 +436,15 @@ const PostDetail = () => {
                                             <Status status={post?.status} />
                                         </div>
                                     </div>
-                                    <div className="flex">
+                                    <div className="flex font-medium">
                                         <Dropdown
+                                            overlayStyle={{ fontSize: 'xl' }}
                                             menu={{
                                                 items,
                                             }}
                                             placement="bottom"
                                         >
-                                            <FontAwesomeIcon icon={faEllipsis} size="lg" className='text-red-500 cursor-pointer'
+                                            <FontAwesomeIcon icon={faEllipsis} size="xl" className='text-red-500 cursor-pointer p-2'
                                                 onClick={(e) => e.preventDefault()} />
                                         </Dropdown>
                                     </div>
@@ -246,6 +455,18 @@ const PostDetail = () => {
                                     <div className="flex justify-center items-center border rounded-lg p-1 shadow-md">
                                         <img className="border-red-500" width={30} src={post.requestTypeIcon} alt="" />
                                         <p className="mx-1 font-bold text-red-600">{post.requestType}</p>
+                                    </div>
+                                )}
+                                {post.isEmergency ? (
+                                    <div className="flex justify-start items-center my-4">
+                                        <FontAwesomeIcon icon={faWarning} color="red" />
+                                        <p className="text-[#F73334] ml-2 font-bold text-base">{t("Khẩn cấp")}</p>
+                                    </div>
+                                ) : null}
+                                {post?.address && (
+                                    <div className="flex items-center justify-center mt-2">
+                                        <FontAwesomeIcon icon={faLocationDot} className="text-red-500" />
+                                        <p className="text-base ml-2">{post?.address}</p>
                                     </div>
                                 )}
                                 <p className="text-base mt-2">{post?.content}</p>
@@ -293,44 +514,38 @@ const PostDetail = () => {
                                     <div className="flex justify-center items-center rounded-lg border-slate-300">
                                         <FontAwesomeIcon className='cursor-pointer px-2 py-2 hover:bg-slate-100 rounded-2xl'
                                             icon={faComment} color="red" size='sm' />
-                                        <p className='mx-2'>15 {t("comments")}</p>
+                                        <p className='mx-2'>{commentCount} {t("comments")}</p>
                                     </div>
                                 </div>
                             </div>
-
                             <div className="mt-4 max-h-40">
-                                <div className="flex items-start my-2">
-                                    <img src={avatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
-                                    <div className="ml-2 bg-gray-100 p-2 rounded-lg">
-                                        <p className="font-bold">Nguyễn Thu</p>
-                                        <p>Có ai tới cứu bạn chưa</p>
-                                        <div className="flex items-center mt-1 text-gray-600">
-                                            <p className="text-xs">2h</p>
+                                {post?.comments.length > 0 && post?.comments?.map((comment, index) => {
+                                    return (
+                                        <div key={index} className="flex flex-col items-start my-2 px-4 w-1/2">
+                                            <div className="flex items-start">
+                                                <img src={comment.user.avatar ? comment.user.avatar : avatar} alt="User Avatar" className="w-10 h-10 rounded-full" />
+                                                <div className="flex">
+                                                    <div className={`ml-2 p-4 text-base shadow-sm bg-gray-100 rounded-lg ${user.id === comment?.user?.id ? 'bg-blue-200' : ''}`}>
+                                                        <p className="font-bold">{comment.user.name}</p>
+                                                        <p>{comment.content}</p>
+                                                        <div className="flex items-center mt-1 text-gray-600">
+                                                            <p className="text-xs">{formatHHmm(comment.createdAt)}</p>
+                                                        </div>
+                                                    </div>
+                                                    {comment.user.id === user.id && (
+                                                        <div className="flex justify-end mx-2">
+                                                            <button className="text-blue-500 hover:text-red-600"
+                                                                onClick={() => { handleDeleteComment(comment._id) }}>
+                                                                <FontAwesomeIcon icon={faTrash} />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-start my-2">
-                                    <img src={avatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
-                                    <div className="ml-2 bg-gray-100 p-2 rounded-lg">
-                                        <p className="font-bold">Nguyễn Văn A</p>
-                                        <p>Bạn hãy gọi cho cơ quan chức năng đi</p>
-                                        <div className="flex items-center mt-1 text-gray-600">
-                                            <p className="text-xs">4h</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-start my-2">
-                                    <img src={avatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
-                                    <div className="ml-2 bg-gray-100 p-2 rounded-lg">
-                                        <p className="font-bold">Nguyen Phuong Nhi</p>
-                                        <p>Bạn có cần hỗ trợ không</p>
-                                        <div className="flex items-center mt-1 text-gray-600">
-                                            <p className="text-xs">3h</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                    );
+                                })}
                             </div>
-
                         </div>
                         <div className="flex z-10 bottom-0 mt-4 items-center sticky bg-white">
                             <img src={avatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
@@ -343,10 +558,87 @@ const PostDetail = () => {
                                     style={{ maxHeight: '100px' }}
                                     placeholder="Write a comment..."
                                 />
-                                <FontAwesomeIcon icon={faPaperPlane} size="lg"
+                                <FontAwesomeIcon icon={faPaperPlane} size="lg" onClick={handleCommentClick}
                                     className="mx-2 text-blue-500 rounded-lg cursor-pointer hover:text-red-600" />
                             </div>
                         </div>
+                        <Dialog
+                            open={open}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={handleClose}
+                            aria-describedby="alert-dialog-slide-description"
+                        >
+                            <DialogTitle>{t("Gửi cảnh báo cho người dùng")}</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-slide-description">
+                                    <label htmlFor="radius">
+                                        {t("Nhập bán kính cảnh báo (m)")}
+                                    </label>
+                                    <input type="number" id="radius" className="border rounded-lg p-2 w-full my-2"
+                                        value={dangerInput.radius} onChange={(e) => {
+                                            setDangerInput((prevInput) => ({
+                                                ...prevInput,
+                                                radius: e.target.value
+                                            }));
+                                        }} />
+                                    <label htmlFor="content">
+                                        {t("Nội dung cảnh báo")}
+                                    </label>
+                                    <textarea id="content" className="border rounded-lg p-2 w-full my-2" value={dangerInput.message}
+                                        onChange={(e) => {
+                                            setDangerInput((prevInput) => ({
+                                                ...prevInput,
+                                                message: e.target.value
+                                            }));
+                                        }} />
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClose}>{t("Hủy")}</Button>
+                                <Button onClick={submitDangerWarning}>{t("Gửi")}</Button>
+                            </DialogActions>
+                        </Dialog>
+                        <Dialog
+                            open={openEdit}
+                            TransitionComponent={Transition}
+                            keepMounted
+                            onClose={handleClose}
+                            aria-describedby="alert-dialog-slide-description"
+                        >
+                            <div className="flex justify-between px-10 items-center">
+                                <DialogTitle>{t("Chỉnh sửa cảnh báo cho người dùng")}</DialogTitle>
+                                <FontAwesomeIcon className="cursor-pointer hover:text-red-600" icon={faClose} size="lg" onClick={() => setOpenEdit(false)} />
+                            </div>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-slide-description">
+                                    <label htmlFor="radius">
+                                        {t("Nhập bán kính cảnh báo (m)")}
+                                    </label>
+                                    <input type="number" id="radius" className="border rounded-lg p-2 w-full my-2"
+                                        value={exitsDanger?.radius} onChange={(e) => {
+                                            setExitsDanger((prevInput) => ({
+                                                ...prevInput,
+                                                radius: e.target.value
+                                            }));
+                                        }} />
+                                    <label htmlFor="content">
+                                        {t("Nội dung cảnh báo")}
+                                    </label>
+                                    <textarea id="content" className="border rounded-lg p-2 w-full my-2" value={exitsDanger?.message}
+                                        onChange={(e) => {
+                                            setExitsDanger((prevInput) => ({
+                                                ...prevInput,
+                                                message: e.target.value
+                                            }));
+                                        }} />
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleDeleteDangerArea}>{t("xóa")}</Button>
+                                <Button onClick={hanleUpdateDangerArea}>{t("Sửa")}</Button>
+                            </DialogActions>
+                        </Dialog>
                     </div >
                 ) : (
                     <Loading />

@@ -11,12 +11,13 @@ import Loading from "../../Loading/Loading";
 import { UserMarkerPlaceProvider } from "../../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import Dangers from "../Dangers/Dangers";
 
 const Rescue = () => {
     const { t } = useTranslation();
     const location = useLocation();
 
-    const { getRescuerRequest, getRequestType, getDangerRequest } = RequestService();
+    const { getRescuerRequest, getRequestType } = RequestService();
 
     const { user, setActiveItem } = useContext(UserContext);
 
@@ -59,17 +60,6 @@ const Rescue = () => {
         }
     };
 
-    const fetchDangerRequests = async () => {
-        try {
-            const requestsData = await getDangerRequest();
-            setRequests(requestsData);
-        } catch (error) {
-            console.error("Failed to fetch requests:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
         setActiveItem('rescue');
         fetchRequests();
@@ -89,7 +79,6 @@ const Rescue = () => {
 
     const handleDangerManagement = () => {
         setActiveMenu('danger');
-        fetchDangerRequests();
     }
 
     if (loading) {
@@ -110,7 +99,7 @@ const Rescue = () => {
                                 <Route path="" element={
                                     <>
                                         <div className="flex justify-between w-1/3 mb-5 mx-5 font-bold">
-                                            {/* <button className="px-3 py-1 hover:bg-red-500 hover:text-white rounded-md">{t("Thống kê")}</button> */}
+                                            <button className="px-3 py-1 hover:bg-red-500 hover:text-white rounded-md">{t("Thống kê")}</button>
                                             <button className={`px-3 py-1 hover:bg-red-500 hover:text-white rounded-md ${activeMenu === 'rescue' ? 'bg-red-500 text-white' : ''}`}
                                                 onClick={() => handleRequestManagement()}
                                             >
@@ -131,8 +120,13 @@ const Rescue = () => {
                                                     onChange={(e) => setSearch(e.target.value)} />
                                             </div>
                                         </div>
-                                        <Post requests={requests} setRequests={setRequests}
-                                            setSelectedRequest={setSelectedRequest} />
+                                        {
+                                            activeMenu === 'rescue' ? <Post
+                                                requests={requests}
+                                                search={search}
+                                                setSelectedRequest={setSelectedRequest}
+                                            /> : <Dangers />
+                                        }
                                     </>}
                                 />
                                 <Route path="/detail/:id" element={<PostDetail />} />

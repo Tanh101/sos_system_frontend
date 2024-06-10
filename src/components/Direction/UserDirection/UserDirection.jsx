@@ -1,18 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Circle, GoogleMap, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
-import { googleMapApiKey, googleMapComponentOptions, mapLibraries } from "../../../constants/config";
+import { googleMapComponentOptions, mapLibraries } from "../../../constants/config";
 
 import PlaceInfo from "../../MyMapComponent/PlaceInfo";
 import Loading from "../../Loading/Loading";
 import socketInstance, { socket } from "../../../utilities/socketInstance";
 import PlaceService from "../../../services/PlaceService";
 import RequestService from "../../../services/RequestService";
+import { UserContext } from "../../../Context/UserContext/UserContext";
 
 const UserDirection = ({ location, address }) => {
     const { emitWithToken } = socketInstance();
 
     const { getDangerArea } = RequestService();
     const { processRescuerPlaces } = PlaceService();
+    const { googleMapApiKey } = useContext(UserContext);
 
     const intervalRef = useRef(null);
     const isListenerSetUp = useRef(false);
@@ -72,9 +74,8 @@ const UserDirection = ({ location, address }) => {
 
     if (!isLoaded) return <Loading />;
     if (loadError) return "Error loading map";
-
     return (
-        location.lat && location.lng ? (
+        location.lat && location.lng && googleMapApiKey ? (
             <GoogleMap
                 id="map"
                 mapContainerStyle={
@@ -99,7 +100,10 @@ const UserDirection = ({ location, address }) => {
                 {dangerArea.length > 0 && dangerArea.map((item, index) => (
                     <Circle
                         key={index}
-                        center={item.location}
+                        center={{
+                            lat: parseFloat(item.location.lat),
+                            lng: parseFloat(item.location.lng)
+                        }}
                         radius={item.radius}
                         options={{
                             strokeColor: '#FF0000',
@@ -110,7 +114,10 @@ const UserDirection = ({ location, address }) => {
                         }}
                         onClick={() => {
                             setSelected({ info: item.message, location: item.location });
-                            setCenter(item.location);
+                            setCenter({
+                                lat: parseFloat(item.location.lat),
+                                lng: parseFloat(item.location.lng)
+                            });
                         }}
                     />
                 ))}
