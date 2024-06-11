@@ -17,6 +17,10 @@ function ErrorProcessService() {
         } else {
             Toastify.error("An error occurred. Please try again later.");
         }
+
+        if (error.response && error.response.status === 400 && error.response.data.message === "Refresh token is invalid") {
+            navigate("/login");
+        }
     }
 
     return {
