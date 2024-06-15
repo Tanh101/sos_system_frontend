@@ -27,8 +27,6 @@ const Dangers = () => {
         fetchDangers();
     }, []);
 
-    console.log(dangers);
-
     return (
         <div className='flex flex-col'>
             {dangers?.length > 0 && dangers.map((item, index) => (

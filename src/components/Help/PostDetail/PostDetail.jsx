@@ -55,6 +55,27 @@ const PostDetail = () => {
     const { id } = useParams();
     const { t } = useTranslation();
 
+    const handleMessageClick = () => {
+        event.stopPropagation();
+        const newChat = {
+            _id: "",
+            lastMessage: {
+                _id: "",
+                sender: user.id,
+                message: "",
+                timestamp: new Date(),
+            },
+            unreadCount: 0,
+            opponent: {
+                id: post.userId,
+                name: post.user.name,
+                avatar: post.user.avatar,
+            },
+        };
+
+        navigate('/messages', { state: { newChat } });
+    };
+
     const { getRequestDetail, vote, updateRequestStatus, isExistDangerInRequest, getDangerArea } = RequestService();
 
     const { user, location } = useContext(UserContext);
@@ -144,11 +165,6 @@ const PostDetail = () => {
         event.stopPropagation();
         setIsOpenStreetView(true);
     }
-
-    const handleMessageClick = (event) => {
-        event.stopPropagation();
-        navigate('/messages');
-    };
 
     const handleUpdateStatus = async (status) => {
         try {
