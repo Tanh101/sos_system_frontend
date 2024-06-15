@@ -1,18 +1,28 @@
-import React from 'react'
-import './index.css'
-import ReactDOM from 'react-dom/client'
+import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer } from "react-toastify";
+import { Provider } from "react-redux";
 
-import Login from './pages/login/Login.jsx';
+import "./index.css";
+import "./i18n.js";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
+import Login from "./pages/Login/Login.jsx";
+import Signup from "./pages/Signup/Signup.jsx";
+import UserNavigation from "./pages/Navigation/UserNavigate/UserNavigate.jsx";
+import { LocaleProvider } from "./Context/LocaleContext/LocaleContext.jsx";
+import store from '../src/redux/store/index';
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+    <Provider store={store}>
         <Router>
-            <Routes>
-                <Route path="/login" element={<Login />} />
-            </Routes>
-            <ToastContainer />
+            <LocaleProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Signup />} />
+                    <Route path="/*" element={<UserNavigation />} />
+                </Routes>
+                <ToastContainer />
+            </LocaleProvider>
         </Router>
-    </React.StrictMode>,
-)
+    </Provider>
+);
