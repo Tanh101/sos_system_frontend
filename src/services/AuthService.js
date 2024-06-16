@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Toastify } from "../toastify/Toastify";
 import api from "../utilities/api";
 import ErrorProcessService from "./ErrorProcessService";
+import { USER_ROLE } from "../constants/config";
 
 function AuthService() {
     const navigate = useNavigate();
@@ -9,7 +10,7 @@ function AuthService() {
     const { errorProcessor } = ErrorProcessService();
 
 
-    const signup = async (email, name, password, repeatPassword, dob, phoneNumber, address) => {
+    const signup = async (role, email, name, password, repeatPassword, dob, phoneNumber, address) => {
         try {
             if (password !== repeatPassword) {
                 Toastify.error("Passwords do not match");
@@ -17,6 +18,7 @@ function AuthService() {
             }
 
             const response = await api.post("/auth/register", {
+                role,
                 email,
                 name,
                 password,

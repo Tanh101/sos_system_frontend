@@ -35,6 +35,16 @@ const Rescue = () => {
     const [loading, setLoading] = useState(true);
     const [requestType, setRequestType] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [selectedRequestType, setSelectedRequestType] = useState(null);
+    const [selectedRequestStatus, setSelectedRequestStatus] = useState(null);
+
+    const handleChangeRequestType = (value) => {
+        setSelectedRequestType(value);
+    };
+
+    const handleChangeRequestStatus = (value) => {
+        setSelectedRequestStatus(value);
+    };
 
     useEffect(() => {
         const fetchRequestType = async () => {
@@ -51,7 +61,17 @@ const Rescue = () => {
 
     const fetchRequests = async () => {
         try {
-            const requestsData = await getRescuerRequest();
+            const filters = {};
+
+            if (selectedRequestType) {
+                filters.type = selectedRequestType;
+            }
+            if (selectedRequestStatus) {
+                filters.status = selectedRequestStatus;
+            }
+
+            const requestsData = await getRescuerRequest(filters);
+            
             setRequests(requestsData);
         } catch (error) {
             console.error("Failed to fetch requests:", error);
@@ -139,9 +159,9 @@ const Rescue = () => {
                             <Select
                                 defaultValue={t("Tất cả")}
                                 style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
-                                onChange={handleChange}
+                                onChange={handleChangeRequestType}
                                 id="filter"
-                                options={requestType}
+                                options={[{ label: t("Tất cả"), value: null }, ...requestType]}
                             />
                         </div>
                         <div className="flex text-sm mt-2 items-center">
@@ -149,35 +169,14 @@ const Rescue = () => {
                             <Select
                                 defaultValue={t("Tất cả")}
                                 style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
-                                onChange={handleChange}
+                                onChange={handleChangeRequestStatus}
                                 id="filter"
                                 options={
                                     [
-                                        { label: t("Tất cả"), value: 0 },
+                                        { label: t("Tất cả"), value: null },
                                         { label: t("Đang chờ"), value: 1 },
                                         { label: t("Đang cứu hộ"), value: 2 },
                                         { label: t("Đã cứu hộ"), value: 3 },
-                                        { label: t("Đã hủy"), value: 4 },
-                                    ]
-                                }
-                            />
-                        </div>
-                        <div className="flex text-sm mt-2 items-center">
-                            <label className="font-medium text-slate-600 w-32 flex-wrap" htmlFor="filter">{t("Khu vực")}</label>
-                            <Select
-                                showSearch
-                                defaultValue={t("Tất cả")}
-                                style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
-                                onChange={handleChange}
-                                onSearch={handleSearch}
-                                id="filter"
-                                options={
-                                    [
-                                        { label: t("Tất cả"), value: 0 },
-                                        { label: t("Liên Chiểu"), value: 1 },
-                                        { label: t("Thanh Khê"), value: 2 },
-                                        { label: t("Hải Châu"), value: 3 },
-                                        { label: t("Sơn Trà"), value: 4 },
                                     ]
                                 }
                             />

@@ -15,15 +15,15 @@ const UserService = () => {
         return pagination;
     }
 
-    const getUsers = async (page = PAGE, itemPerPage = ITEM_PER_PAGE) => {
+    const getUsers = async (role, page = PAGE, itemPerPage = ITEM_PER_PAGE) => {
         try {
-            const response = await api.get(`/user?itemPerpage=${itemPerPage}&page=${page}`);
+            const response = await api.get(`/user?itemPerpage=${itemPerPage}&page=${page}&role=${role}`);
             const pagination = processData(response.data.pagination);
             return { users: response.data.users, pagination };
         } catch (error) {
             errorProcessor(error);
         }
-    }   
+    }
 
     const updateUserStatus = async (id) => {
         try {

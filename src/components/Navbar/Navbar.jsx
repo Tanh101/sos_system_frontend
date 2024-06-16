@@ -13,9 +13,7 @@ import Badge from '@mui/material/Badge';
 import IconButton from '@mui/material/IconButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import NotificationList from '../NotificationList/NotificationList';
-import { Dropdown } from 'antd';
 import socketInstance, { socket } from '../../utilities/socketInstance';
-import { USER_ROLE } from '../../constants/config';
 
 const Navbar = () => {
     const { t } = useTranslation();
@@ -25,12 +23,12 @@ const Navbar = () => {
     const { handleChangeLanguage, currentLanguage } = useContext(LocaleContext);
     const { user } = useContext(UserContext);
 
-    const [count, setCount] = useState(1);
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const notificationRef = useRef(null);
     const [notificationList, setNotificationList] = useState([]);
+    const [userCount, setUserCount] = useState({ unviewedNotifications: 0, unviewedMessages: 0 });
 
     const { logout } = AuthService();
 
@@ -38,7 +36,8 @@ const Navbar = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
 
-    const toggleNoti = () => {
+    const toggleNoti = async () => {
+        emitWithToken("resetUnviewedNotifications");
         setIsOpen(!isOpen);
     };
 
@@ -71,9 +70,20 @@ const Navbar = () => {
         emitWithToken("getNotification");
 
         socket.on("notificationList", (data) => {
-            setCount(data.length);
             setNotificationList(data);
         });
+    }, [user]);
+
+    useEffect(() => {
+        emitWithToken("getUnviewedCounts");
+
+        socket.on("unviewedCountUpdated", data => {
+            setUserCount(data);
+        });
+
+        return () => {
+            socket.off("unviewedCountUpdated");
+        };
     }, [user]);
 
     return (
@@ -92,7 +102,7 @@ const Navbar = () => {
                 <div className="flex flex-row relative mx-10">
                     <div className="flex Notification" onClick={toggleNoti} ref={notificationRef}>
                         <IconButton aria-label="Notifications">
-                            <Badge badgeContent={count} color="error">
+                            <Badge badgeContent={userCount?.unviewedNotifications} color="error">
                                 <FontAwesomeIcon color='slate-400' icon={faBell} onClick={toggleNoti} />
                             </Badge>
                         </IconButton>

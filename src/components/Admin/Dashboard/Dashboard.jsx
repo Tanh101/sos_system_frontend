@@ -27,14 +27,14 @@ const Dashboard = () => {
 
     const data = [
         { id: 0, value: requestData?.totalRequestPending, label: 'Đang chờ' },
-        { id: 1, value: requestData?.totalRequestRecuing, label: 'Đang hỗ trợ' },
+        { id: 1, value: requestData?.totalRequestRescuing, label: 'Đang hỗ trợ' },
         { id: 2, value: requestData?.totalRequestRescued, label: 'Đã hỗ trợ' },
     ];
 
     return (
         <>
             {data ? (
-                < div className="flex flex-col  h-screen justify-start items-start w-full pr-10 bg-slate-100 overflow-y-auto">
+                < div className="flex flex-col  h-screen justify-start items-start w-full pr-10 bg-slate-100 overflow-y-auto z-30">
                     <div className="flex flex-col w-full bg-white m-5 p-5 px-10 rounded-lg shadow-sm mr-10">
                         <p className='font-bold'>
                             {t('Bảng điều khiển')}

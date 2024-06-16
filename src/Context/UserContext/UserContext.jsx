@@ -49,8 +49,10 @@ export const UserProvider = ({ children }) => {
 
         const fetchGoogleMapAPIKey = async () => {
             const key = await getGoogleMapAPIKey();
-            setGoogleMapApiKey(key);
-            setIsApiKeyLoaded(true);
+            if (key) {
+                setGoogleMapApiKey(key);
+                setIsApiKeyLoaded(true);
+            }
         }
 
         const fetchUserProfile = async () => {
@@ -84,7 +86,6 @@ export const UserProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        console.log('useEffect line 84');
         if (location.lat && location.lng) {
             upDateLocationToMongo(location);
         }
@@ -141,7 +142,6 @@ export const UserProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        console.log('useEffect line 141');
         if (emergencyRequests.length > 0 && socket && location.lat
             && location.lng && user.id === emergencyRequests[0].userId) {
             updateLocationWithSocket();
