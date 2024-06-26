@@ -114,7 +114,7 @@ const Login = () => {
                         </div>
                     </form>
                     <div className="flex justify-center items-center text-sm mt-6">
-                        <p>{`Don't have an acoount?`}{SPACE_CHARACTER}</p>
+                        <p>{`Don't have an account?`}{SPACE_CHARACTER}</p>
                         <Link to="/register">
                             <p className="font-bold text-blue-600"> Sign up</p>
                         </Link>

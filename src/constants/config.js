@@ -81,12 +81,14 @@ const CONVERT_REQUEST_STATUS = {
 }
 const USER_STATUS = {
     ACTIVE: 1,
-    DELETED: 0
+    DELETED: 0,
+    PENDING: 2,
 }
 
 const USER_STATUS_TEXT = {
     [USER_STATUS.ACTIVE]: "Active",
-    [USER_STATUS.DELETED]: "Deleted"
+    [USER_STATUS.DELETED]: "Deleted",
+    [USER_STATUS.PENDING]: "Pending",
 }
 
 const USER_ROLE = {
@@ -100,6 +102,11 @@ const REMOVE_EMERGENCY_REQUEST = "REMOVE_EMERGENCY_REQUEST";
 const FETCH_EMERGENCY_REAQUEST = "FETCH_EMERGENCY_REAQUEST";
 
 const GET_NOTIFICATION = "GET_NOTIFICATION";
+
+const DANGER_STATUS = {
+    ACTIVE: 'active',
+    DELETED: 'deleted'
+}
 
 export {
     AppBaseUrl,
@@ -131,4 +138,5 @@ export {
     GET_NOTIFICATION,
     REQUEST_STATUS_COLORS,
     CONVERT_REQUEST_STATUS,
+    DANGER_STATUS,
 }

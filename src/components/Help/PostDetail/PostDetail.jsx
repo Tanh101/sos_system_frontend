@@ -152,7 +152,7 @@ const PostDetail = () => {
 
             listenUpdateStatus();
         }
-
+        
         return () => {
             clearInterval(intervalRef.current);
             socket.off('locationUpdate');
@@ -210,16 +210,6 @@ const PostDetail = () => {
 
     const hanleUpdateDangerArea = async () => {
         try {
-            const fetchExistDangerInRequest = async () => {
-                try {
-                    const response = await isExistDangerInRequest(id);
-                    setExitsDanger(response);
-                }
-                catch (error) {
-                    console.error('Failed to fetch exist danger in request:', error);
-                }
-            };
-
             emitWithToken("updateDangerArea", {
                 requestId: id,
                 radius: exitsDanger.radius,
@@ -272,7 +262,7 @@ const PostDetail = () => {
             ),
             icon: <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: '16px', color: 'red' }} />,
         },
-        ...(exitsDanger && user.role === USER_ROLE.RESCUER && exitsDanger?.rescuerId == user.id ? [{
+        ...(post?.dangerStatus === 'active' && user.role === USER_ROLE.RESCUER && exitsDanger?.rescuerId == user.id ? [{
             key: '4',
             label: (
                 <button className="text-base p-2" onClick={handleOpenUpdateDangerArea}>
@@ -281,11 +271,11 @@ const PostDetail = () => {
             ),
             icon: <FontAwesomeIcon icon={faEdit} style={{ fontSize: '16px', color: 'red' }} />,
         }] : []),
-        ...(!exitsDanger && user.role === USER_ROLE.RESCUER ? [{
+        ...((post?.dangerStatus === 'deleted' || post?.dangerStatus === null) && user.role === USER_ROLE.RESCUER ? [{
             key: '10',
             label: (
                 <button className="text-base p-2" onClick={handleSendWarning}>
-                    {t("Cảnh báo nguy hiểm")}
+                    {t("Thêm cảnh báo nguy hiểm")}
                 </button>
             ),
             icon: <FontAwesomeIcon icon={faWarning} style={{ fontSize: '16px', color: 'red' }} />,
@@ -387,7 +377,7 @@ const PostDetail = () => {
             const { comment, commentCount } = data;
             setPost((prevPost) => ({
                 ...prevPost,
-                comments: [...prevPost.comments, comment]
+                comments: [comment, ...prevPost.comments],
             }));
             setCommentCount(commentCount);
         });
@@ -418,7 +408,7 @@ const PostDetail = () => {
     }, [id]);
 
     return (
-        <div>
+        <div className="z-30">
             {
                 post ? (
                     <div className='bg-white justify-center text-sm rounded-lg px-10 shadow-lg w-full flex flex-col' >

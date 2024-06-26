@@ -11,11 +11,11 @@ import Logo from "../../components/Logo/Logo"
 import AuthService from "../../services/AuthService";
 import { formatDate } from "../../utilities/formatDate";
 import signupSchema from "../../validations/signupSchema";
-import { SPACE_CHARACTER } from "../../constants/config";
+import { SPACE_CHARACTER, USER_ROLE } from "../../constants/config";
 
 const schema = signupSchema;
 
-const Signup = () => {
+const RescuerSignup = () => {
     const { signup } = AuthService();
 
     const [date, setDate] = useState(formatDate(new Date()));
@@ -32,7 +32,7 @@ const Signup = () => {
 
     const formSubmit = async (data) => {
         const { email, name, password, repeatPassword, phoneNumber, dob, address } = data;
-        signup(email, name, password, repeatPassword, formatDate(dob), phoneNumber, address);
+        signup(USER_ROLE.RESCUER, email, name, password, repeatPassword, formatDate(dob), phoneNumber, address);
     }
 
     const handleDateChange = (date) => {
@@ -44,14 +44,14 @@ const Signup = () => {
 
     return (
         <div className="flex h-screen justify-center items-center bg-slate-100">
-            <div className="flex flex-col shadow-xl p-5 px-20 rounded-lg bg-white w-auto">
+            <div className="flex flex-col shadow-xl p-10 px-20 rounded-lg bg-white w-auto">
                 <Logo />
                 <form
                     className="form flex flex-col mt-2 w-full"
                     onSubmit={handleSubmit(formSubmit)}
                 >
                     <p className="text-[#F73334] text-4xl mb-10 font-semibold">
-                        Registration
+                        Rescuer Registration
                     </p>
                     <div className="flex">
                         <div className="flex flex-col justify-center">
@@ -209,21 +209,11 @@ const Signup = () => {
                         </button>
                     </div>
                 </form>
-                <div className="flex flex-col justify-center items-center text-sm mt-6">
-                    <div className="flex flex-row">
-                        <p>
-                            Do you want to become a rescue?{SPACE_CHARACTER}
-                        </p>
-                        <Link to="/rescuer-register">
-                            <p className="font-bold text-blue-600"> Rescuer Register {SPACE_CHARACTER}</p>
-                        </Link>
-                    </div>
-                    <div className="flex flex-row">
-                        <p> Already have an acount?{SPACE_CHARACTER}</p>
-                        <Link to="/login">
-                            <p className="font-bold text-blue-600"> Login</p>
-                        </Link>
-                    </div>
+                <div className="flex justify-center items-center text-sm mt-6">
+                    <p> Already have an acount?{SPACE_CHARACTER}</p>
+                    <Link to="/login">
+                        <p className="font-bold text-blue-600"> Login</p>
+                    </Link>
                 </div>
             </div>
 
@@ -231,4 +221,4 @@ const Signup = () => {
     )
 }
 
-export default Signup
+export default RescuerSignup;

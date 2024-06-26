@@ -37,8 +37,8 @@ const Inbox = () => {
     useEffect(() => {
         if (location.state?.newChat) {
             const newChat = location.state.newChat;
-            // Check if the new chat already exists in chatList
-            const chatExists = chatList.some(chat => chat.opponent.id === newChat.opponent.id);
+
+            const chatExists = chatList.some(chat => chat?.opponent?.id === newChat?.opponent?.id);
             if (!chatExists) {
                 setChatList(prevList => [newChat, ...prevList]);
                 setSelectedChat(newChat);
@@ -48,10 +48,18 @@ const Inbox = () => {
     }, [location.state, chatList]);
 
     useEffect(() => {
+        const fetchConversations = async () => {
+            const response = await getConversationsByUserId();
+            setChatList(response);
+        }
+
+        fetchConversations();
+    }, []);
+
+    useEffect(() => {
         socket.on("privateMessage", (data) => {
             const { conversationId, message } = data;
             setSelectedChat(prevChat => {
-                // Update the selected chat's last message
                 if (prevChat) {
                     return {
                         ...prevChat,
@@ -65,15 +73,15 @@ const Inbox = () => {
                 return prevChat;
             });
             setChatList(prevList => {
-                // Update the chatList with the new message
                 return prevList.map(chat => {
                     if (chat._id === conversationId) {
                         return {
                             ...chat,
                             lastMessage: {
                                 ...chat.lastMessage,
+                                sender: message.sender,
                                 message: message.message,
-                            }
+                            },
                         };
                     }
                     return chat;
@@ -117,7 +125,7 @@ const Inbox = () => {
                     ...prevChat.lastMessage,
                     messages: [...(prevChat.lastMessage?.messages || []), message]
                 },
-                
+
             };
         });
 
@@ -128,6 +136,7 @@ const Inbox = () => {
                         ...chat,
                         lastMessage: {
                             ...chat.lastMessage,
+                            sender: chat.opponent.id,
                             message: message,
                         }
                     };
@@ -138,8 +147,8 @@ const Inbox = () => {
     };
 
     return (
-        <div className="flex h-screen w-full">
-            <ChatList chats={chatList} setSelectedChat={setSelectedChat} />
+        <div className="flex h-screen w-full z-30">
+            <ChatList chats={chatList} setChats={setChatList} setSelectedChat={setSelectedChat} />
             {selectedChat && <ChatWindow chat={selectedChat} onSendMessage={handleSendMessage} />}
         </div>
     );

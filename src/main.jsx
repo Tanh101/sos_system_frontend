@@ -11,6 +11,7 @@ import Signup from "./pages/Signup/Signup.jsx";
 import UserNavigation from "./pages/Navigation/UserNavigate/UserNavigate.jsx";
 import { LocaleProvider } from "./Context/LocaleContext/LocaleContext.jsx";
 import store from '../src/redux/store/index';
+import RescuerSignup from "./pages/RescuerSignup/RescuerSignup.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Signup />} />
+                    <Route path="/rescuer-register" element={<RescuerSignup />} />
                     <Route path="/*" element={<UserNavigation />} />
                 </Routes>
                 <ToastContainer />

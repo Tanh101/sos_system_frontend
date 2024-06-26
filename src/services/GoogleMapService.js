@@ -2,10 +2,17 @@ import { Toastify } from "../toastify/Toastify";
 import ErrorProcessService from "./ErrorProcessService";
 import api from "../utilities/api";
 
+let staticApiKey = null;
+
 const getGoogleMapAPIKey = async () => {
     try {
+        if (staticApiKey) {
+            return staticApiKey;
+        }
+
         const response = await api.get('/seeder/key');
         if (response.status === 200) {
+            staticApiKey = response.data.key;
             return response.data.key;
         } else {
             throw new Error('Failed to fetch API key');

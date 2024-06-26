@@ -43,6 +43,7 @@ const RequestService = () => {
                 rescuerId: item.rescuerId,
                 commentCount: item.commentCount,
                 comments: item.comments,
+                dangerStatus: item.dangerStatus,
             }
             return res;
         } catch (error) {
@@ -113,6 +114,7 @@ const RequestService = () => {
                     userId: item.userId,
                     rescuerId: item.rescuerId,
                     commentCount: item.commentCount,
+                    dangerStatus: item.dangerStatus,
                 };
             });
         } catch (error) {
@@ -291,6 +293,7 @@ const RequestService = () => {
                     requestId: item.requestId,
                     rescuerId: item.rescuerId,
                     address: item?.address,
+                    status: item.status,
                 }
             });
 
@@ -322,7 +325,6 @@ const RequestService = () => {
             }
         } catch (error) {
             console.log(error);
-            errorProcessor(error);
         }
     }
 

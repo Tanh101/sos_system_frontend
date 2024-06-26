@@ -42,6 +42,7 @@
         "Khu vực": "Area",
         "Đang chờ": "Pending",
         "Đang cứu hộ": "Rescuing",
+        "Đã cứu hộ": "Rescued",
         "Thông tin vị trí" : "Location information",
         "Chỉnh sửa": "Edit",
         "Xóa": "Delete",
@@ -50,7 +51,6 @@
         "Nhắn tin": "Chat",
         "Hủy yêu cầu": "Cancel request",
         "Đã hủy": "Cancelled",
-        "Đã hoàn thành": "Completed",
         "Đã chấp nhận": "Accepted",
         "Xem vị trí": "View location",
         "Bảng điều khiển": "Dashboard",
@@ -76,6 +76,10 @@
         "Trợ giúp": "Help",
         "Thống kê": "Statistics",
         "Quản lý yêu cầu": "Request management",
-        "Quản lý cảnh báo": "Danger area management"
+        "Quản lý cảnh báo": "Danger area management",
+        "Nhập tin nhắn...": "Enter message...",
+        "Thông báo" : "Notifications",
+        "Người dùng": "User",
+        "Thêm cảnh báo nguy hiểm": "Add danger area"
     }
 }
