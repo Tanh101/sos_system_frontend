@@ -87,7 +87,7 @@ const Chatbot = () => {
             {showChatbot && (
                 <div className="fixed bottom-10 right-10 w-96 h-[560px] bg-white border shadow-lg flex flex-col font-roboto text-sm">
                     <div className="flex justify-between items-center bg-[#F73334] text-white p-4 rounded-t-lg">
-                        <h1 className='text-xl'>{t("REQ hỗ trợ")}</h1>
+                        <h1 className='text-xl'>{t("ResQ hỗ trợ")}</h1>
                         <button className='text-white hover:bg-white hover:text-red-600 rounded-2xl px-2' onClick={() => setShowChatbot(false)}>
                             <FontAwesomeIcon icon={faClose} />
                         </button>

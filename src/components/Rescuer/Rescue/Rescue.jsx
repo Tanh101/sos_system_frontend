@@ -105,7 +105,9 @@ const Rescue = () => {
     }, [selectedRequestType, selectedRequestStatus]);
 
     if (loading) {
-        return <Loading />
+        return <div className="flex w-full justify-center items-center">
+            <Loading />
+        </div>
     }
 
     return (
