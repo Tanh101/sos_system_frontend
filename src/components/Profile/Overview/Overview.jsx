@@ -169,7 +169,7 @@ const Overview = () => {
                                     {...register("address")}
                                 />
                             ) : (
-                                <p className="px-3 py-1">{user.address}</p>
+                                <p className="ml-24 px-3 py-1">{user.address}</p>
                             )}
                         </div>
                         <div className="flex justify-start items-center mb-4">

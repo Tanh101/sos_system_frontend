@@ -80,6 +80,14 @@
         "Nhập tin nhắn...": "Enter message...",
         "Thông báo" : "Notifications",
         "Người dùng": "User",
-        "Thêm cảnh báo nguy hiểm": "Add danger area"
+        "Thêm cảnh báo nguy hiểm": "Add danger area",
+        "Hãy chọn một người để bắt đầu cuộc trò chuyện" : "Choose a person to start a conversation",
+        "Không có tin nhắn": "No messages",
+        "Chưa có cảnh báo được tạo" : "No alerts have been created",
+        "Tất cả": "All",
+        "Đang chờ": "Pending",
+        "Đang cứu hộ": "Rescuing",
+        "Đã cứu hộ": "Rescued",
+        "Thông thường": "Normal"
     }
 }

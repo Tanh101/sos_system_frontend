@@ -35,12 +35,7 @@ const ChatList = ({ chats, setChats, setSelectedChat }) => {
                 <button className={`${activeItem === 'unread' ? ' bg-slate-100 text-red-600' : ''} mx-4 px-2 py-1
                  rounded-xl hover:bg-slate-100 hover:text-red-600 font-medium`}
                     onClick={() => setActiveItem('unread')}>
-                    Unread
-                </button>
-                <button className={`${activeItem === 'read' ? ' bg-slate-100 text-red-600' : ''} mx-4 px-2 py-1
-                 rounded-xl hover:bg-slate-100 hover:text-red-600 font-medium`}
-                    onClick={() => setActiveItem('read')}>
-                    Read
+                    All
                 </button>
             </div>
             {chats && chats?.map(chat => (
@@ -75,6 +70,11 @@ const ChatList = ({ chats, setChats, setSelectedChat }) => {
                     </div>
                 </div>
             ))}
+            {chats.length === 0 &&
+                <div className="flex justify-center items-center h-64">
+                    <p>{t('Không có tin nhắn')}</p>
+                </div>
+            }
         </div>
     );
 };

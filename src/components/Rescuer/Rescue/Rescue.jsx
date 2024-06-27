@@ -12,6 +12,8 @@ import { UserMarkerPlaceProvider } from "../../../Context/UserMarkerPlaceContext
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import Dangers from "../Dangers/Dangers";
+import Statistic from "../Statistics/Statistic";
+import { REQUEST_STATUS } from "../../../constants/config";
 
 const Rescue = () => {
     const { t } = useTranslation();
@@ -69,9 +71,8 @@ const Rescue = () => {
             if (selectedRequestStatus) {
                 filters.status = selectedRequestStatus;
             }
-
             const requestsData = await getRescuerRequest(filters);
-            
+
             setRequests(requestsData);
         } catch (error) {
             console.error("Failed to fetch requests:", error);
@@ -83,14 +84,8 @@ const Rescue = () => {
     useEffect(() => {
         setActiveItem('rescue');
         fetchRequests();
-    }, [location]);
+    }, []);
 
-
-    useEffect(() => {
-        if (user && user.role === 'rescuer') {
-
-        }
-    }, [user]);
 
     const handleRequestManagement = () => {
         setActiveMenu('rescue');
@@ -100,6 +95,14 @@ const Rescue = () => {
     const handleDangerManagement = () => {
         setActiveMenu('danger');
     }
+
+    const handleStatistics = () => {
+        setActiveMenu('statistics');
+    }
+
+    useEffect(() => {
+        fetchRequests();
+    }, [selectedRequestType, selectedRequestStatus]);
 
     if (loading) {
         return <Loading />
@@ -119,7 +122,11 @@ const Rescue = () => {
                                 <Route path="" element={
                                     <>
                                         <div className="flex justify-between w-1/3 mb-5 mx-5 font-bold">
-                                            <button className="px-3 py-1 hover:bg-red-500 hover:text-white rounded-md">{t("Thống kê")}</button>
+                                            {/* <button className={`px-3 py-1 hover:bg-red-500 hover:text-white rounded-md ${activeMenu === 'statistics' ? 'bg-red-500 text-white' : ''}`}
+                                                onClick={() => handleStatistics()}
+                                            >
+                                                {t("Thống kê")}
+                                            </button> */}
                                             <button className={`px-3 py-1 hover:bg-red-500 hover:text-white rounded-md ${activeMenu === 'rescue' ? 'bg-red-500 text-white' : ''}`}
                                                 onClick={() => handleRequestManagement()}
                                             >
@@ -141,11 +148,18 @@ const Rescue = () => {
                                             </div>
                                         </div>
                                         {
-                                            activeMenu === 'rescue' ? <Post
-                                                requests={requests}
-                                                search={search}
-                                                setSelectedRequest={setSelectedRequest}
-                                            /> : <Dangers />
+                                            activeMenu === 'rescue' ?
+                                                (
+                                                    <Post
+                                                        requests={requests}
+                                                        search={search}
+                                                        setSelectedRequest={setSelectedRequest}
+                                                    />
+                                                ) : activeMenu === 'statistics' ? (
+                                                    <Statistic />
+                                                ) : (
+                                                    <Dangers />
+                                                )
                                         }
                                     </>}
                                 />
@@ -161,22 +175,21 @@ const Rescue = () => {
                                 style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
                                 onChange={handleChangeRequestType}
                                 id="filter"
-                                options={[{ label: t("Tất cả"), value: null }, ...requestType]}
+                                options={[{ label: t("Tất cả"), value: 'all' }, ...requestType]}
                             />
                         </div>
                         <div className="flex text-sm mt-2 items-center">
                             <label className="font-medium text-slate-600 w-32 flex-wrap" htmlFor="filter">{t("Trạng thái yêu cầu")}</label>
                             <Select
-                                defaultValue={t("Tất cả")}
+                                defaultValue={t("Đang chờ")}
                                 style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
                                 onChange={handleChangeRequestStatus}
                                 id="filter"
                                 options={
                                     [
-                                        { label: t("Tất cả"), value: null },
-                                        { label: t("Đang chờ"), value: 1 },
-                                        { label: t("Đang cứu hộ"), value: 2 },
-                                        { label: t("Đã cứu hộ"), value: 3 },
+                                        { label: t("Đang chờ"), value: REQUEST_STATUS.PENDING },
+                                        { label: t("Đang cứu hộ"), value: REQUEST_STATUS.RESCUING },
+                                        { label: t("Đã cứu hộ"), value: REQUEST_STATUS.RESCUED },
                                     ]
                                 }
                             />

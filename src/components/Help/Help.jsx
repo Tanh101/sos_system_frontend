@@ -13,6 +13,7 @@ import Post from "./Post/Post";
 import FormRequest from "../Emergency/FormRequest/FormRequest";
 import { UserMarkerPlaceProvider } from "../../Context/UserMarkerPlaceContext/UserMarkerPlaceContext";
 import PostDetail from "./PostDetail/PostDetail";
+import { REQUEST_STATUS } from "../../constants/config";
 
 const Help = () => {
     const { t } = useTranslation();
@@ -22,13 +23,6 @@ const Help = () => {
 
     const { user, setActiveItem } = useContext(UserContext);
 
-    const handleChange = (value) => {
-        console.log(`selected ${value}`);
-    };
-
-    const handleSearch = (value) => {
-        console.log(`search ${value}`);
-    };
 
     const [realTimeRequest, setRealTimeRequest] = useState([]);
     const [search, setSearch] = useState('');
@@ -37,6 +31,8 @@ const Help = () => {
     const [requestType, setRequestType] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isVisible, setIsVisible] = useState(true);
+    const [selectedRequestStatus, setSelectedRequestStatus] = useState(null);
+    const [selectedRequestType, setSelectedRequestType] = useState(null);
 
     useEffect(() => {
         const fetchRequestType = async () => {
@@ -54,7 +50,16 @@ const Help = () => {
 
     const fetchRequests = async () => {
         try {
-            const requestsData = await getRequests();
+            const filters = {};
+
+            if (selectedRequestStatus) {
+                filters.status = selectedRequestStatus;
+            }
+
+            if (selectedRequestType) {
+                filters.type = selectedRequestType;
+            }
+            const requestsData = await getRequests(filters);
             setRequests(requestsData);
         } catch (error) {
             console.error("Failed to fetch requests:", error);
@@ -62,6 +67,19 @@ const Help = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchRequests();
+    }, [selectedRequestStatus, selectedRequestType]);
+
+    const handleChangeRequestStatus = (value) => {
+        setSelectedRequestStatus(value);
+    };
+
+    const handleChange = (value) => {
+        setSelectedRequestType(value);
+    };
+
 
     useEffect(() => {
         if (location.pathname.includes('/help/detail/')) {
@@ -74,12 +92,6 @@ const Help = () => {
         fetchRequests();
     }, [location]);
 
-
-    useEffect(() => {
-        if (user && user.role === 'rescuer') {
-
-        }
-    }, [user, realTimeRequest]);
 
     if (loading) {
         return (
@@ -138,7 +150,13 @@ const Help = () => {
                                     style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
                                     onChange={handleChange}
                                     id="filter"
-                                    options={requestType}
+                                    options={
+                                        [
+                                            { label: t("Tất cả"), value: '' },
+                                            { label: t("Khẩn cấp"), value: '1' },
+                                            { label: t("Thông thường"), value: '0' },
+                                        ]
+                                    }
                                 />
                             </div>
                             <div className="flex text-sm mt-2 items-center">
@@ -146,35 +164,14 @@ const Help = () => {
                                 <Select
                                     defaultValue={t("Tất cả")}
                                     style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
-                                    onChange={handleChange}
+                                    onChange={handleChangeRequestStatus}
                                     id="filter"
                                     options={
                                         [
-                                            { label: t("Tất cả"), value: 0 },
-                                            { label: t("Đang chờ"), value: 1 },
-                                            { label: t("Đang cứu hộ"), value: 2 },
-                                            { label: t("Đã cứu hộ"), value: 3 },
-                                            { label: t("Đã hủy"), value: 4 },
-                                        ]
-                                    }
-                                />
-                            </div>
-                            <div className="flex text-sm mt-2 items-center">
-                                <label className="font-medium text-slate-600 w-32 flex-wrap" htmlFor="filter">{t("Khu vực")}</label>
-                                <Select
-                                    showSearch
-                                    defaultValue={t("Tất cả")}
-                                    style={{ width: '100%', borderColor: "red", marginLeft: 10, outlineColor: "red", fontSize: 20 }}
-                                    onChange={handleChange}
-                                    onSearch={handleSearch}
-                                    id="filter"
-                                    options={
-                                        [
-                                            { label: t("Tất cả"), value: 0 },
-                                            { label: t("Liên Chiểu"), value: 1 },
-                                            { label: t("Thanh Khê"), value: 2 },
-                                            { label: t("Hải Châu"), value: 3 },
-                                            { label: t("Sơn Trà"), value: 4 },
+                                            { label: t("Tất cả"), value: '' },
+                                            { label: t("Đang chờ"), value: '0' },
+                                            { label: t("Đang cứu hộ"), value: REQUEST_STATUS.RESCUING },
+                                            { label: t("Đã cứu hộ"), value: REQUEST_STATUS.RESCUED },
                                         ]
                                     }
                                 />

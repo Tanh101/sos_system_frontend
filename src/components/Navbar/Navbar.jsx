@@ -14,6 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import NotificationList from '../NotificationList/NotificationList';
 import socketInstance, { socket } from '../../utilities/socketInstance';
+import { USER_ROLE } from '../../constants/config';
 
 const Navbar = () => {
     const { t } = useTranslation();
@@ -118,7 +119,7 @@ const Navbar = () => {
                         <img className='object-cover w-12 h-12 cursor-pointer' loading='lazy' src={avatar} alt="" />
                     </div>
                     <div className='flex justify-between flex-1 flex-col mx-5 font-semibold cursor-pointer'>
-                        <p className='font-semibold'>{user?.name}</p>
+                        <p className='font-semibold'>{user?.name} - {user?.role === USER_ROLE.RESCUER ? t("Cứu hộ") : ""} </p>
                         <p className='text-sm font-normal'>{user?.email}</p>
                     </div>
                     {isDropdownOpen && (

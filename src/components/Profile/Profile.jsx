@@ -41,19 +41,6 @@ const Profile = () => {
         <div className="flex flex-col bg-white flex-1">
             <div className="flex justify-start items-start lg:mx-40 md:mx-10">
                 <div className="flex flex-col flex-1 items-center justify-center p-4 h-screen mb-2">
-                    <div className="flex justify-start items-center">
-                        <div className="relative">
-                            <img
-                                className="w-24 h-24 rounded-full object-cover"
-                                src={avatar}
-                                alt="User Avatar"
-                            />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-lg font-semibold">test</p>
-                            <p className="text-sm text-gray-600">test@gmail.com</p>
-                        </div>
-                    </div>
                     <div className="flex  py-2 border-b w-full justify-center mx-4">
                         <button
                             className={`px-2 py-2 mx-5 rounded-2xl border-white hover:bg-slate-200 ${activeMenu === '' ? 'bg-gray-200' : ''}`}

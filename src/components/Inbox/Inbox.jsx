@@ -147,9 +147,9 @@ const Inbox = () => {
     };
 
     return (
-        <div className="flex h-screen w-full z-30">
+        <div className="flex h-screen w-full z-30 bg-white">
             <ChatList chats={chatList} setChats={setChatList} setSelectedChat={setSelectedChat} />
-            {selectedChat && <ChatWindow chat={selectedChat} onSendMessage={handleSendMessage} />}
+            {<ChatWindow chat={selectedChat} onSendMessage={handleSendMessage} />}
         </div>
     );
 };

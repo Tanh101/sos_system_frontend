@@ -11,7 +11,7 @@ import Logo from "../../components/Logo/Logo"
 import AuthService from "../../services/AuthService";
 import { formatDate } from "../../utilities/formatDate";
 import signupSchema from "../../validations/signupSchema";
-import { SPACE_CHARACTER } from "../../constants/config";
+import { SPACE_CHARACTER, USER_ROLE } from "../../constants/config";
 
 const schema = signupSchema;
 
@@ -32,7 +32,7 @@ const Signup = () => {
 
     const formSubmit = async (data) => {
         const { email, name, password, repeatPassword, phoneNumber, dob, address } = data;
-        signup(email, name, password, repeatPassword, formatDate(dob), phoneNumber, address);
+        signup(USER_ROLE.USER, email, name, password, repeatPassword, formatDate(dob), phoneNumber, address);
     }
 
     const handleDateChange = (date) => {

@@ -122,14 +122,13 @@ const RequestService = () => {
         }
     };
 
-    const getRequests = async (requestType = null, status = null, isEmergency = null) => {
+    const getRequests = async (filters) => {
         try {
             const response = await api.get("/requests", {
                 params: {
-                    requestType,
-                    status,
-                    isEmergency,
-                },
+                    status: filters.status,
+                    isEmergency: filters.type,
+                }
             });
 
             if (response.status === 200) {
@@ -240,11 +239,12 @@ const RequestService = () => {
         }
     }
 
-    const getRescuerRequest = async (status = null) => {
+    const getRescuerRequest = async (filters) => {
         try {
             const response = await api.get("/requests/rescuer", {
                 params: {
-                    status
+                    type: filters.type,
+                    status: filters.status,
                 }
             });
 
